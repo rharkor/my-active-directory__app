@@ -79,21 +79,19 @@ export default function LoginForm() {
       setIsSubmitting(true);
       const response = await apiRegisterFirstUser(values);
       //? Set the token in the api client
-      api.setAccessToken(response.accessToken);
+      api.setTokens(response);
       //? Redirect to the home page
-      // router.push('/');
+      router.push('/');
     } catch (error) {
       if (typeof error === 'string') {
         toast({
           title: 'Error',
           description: error,
-          variant: 'destructive',
         });
       } else {
         toast({
           title: 'Error',
           description: 'Something went wrong.',
-          variant: 'destructive',
         });
       }
     } finally {
@@ -146,7 +144,7 @@ export default function LoginForm() {
               {isSubmitting && (
                 <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
               )}
-              Submit
+              Register
             </Button>
           </CardFooter>
         </Card>

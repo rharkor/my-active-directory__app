@@ -5,12 +5,17 @@ import jwt_decode from 'jwt-decode';
 import api from './api';
 import { TokenDecoded } from '@/types/api';
 import { logger } from './logger';
+import { NextResponse } from 'next/server';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 
 /**
  * Get the user session from the request cookies
  * @returns The user session or null
  */
-export function getUserSession(cookies: RequestCookies | Cookies) {
+export async function getUserSession(
+  cookies: RequestCookies | Cookies,
+  response?: NextResponse<unknown>,
+) {
   //? Get the session from the request
   let session: string | undefined;
   if (cookies instanceof Cookies) session = cookies.get('mad-session');
@@ -41,13 +46,15 @@ export function getUserSession(cookies: RequestCookies | Cookies) {
       //? If there is no refresh token, return null
       if (!refreshToken) return null;
       //? Refresh the token
-      api.refreshToken(session, refreshToken);
+      const tokens = await api.refreshToken(session, refreshToken);
+      //? Store the access token in the cookies
+      api.setTokens(tokens, response);
     }
 
     //? Return user session
     return accessToken;
   } catch (error) {
-    console.error('Error decoding the access token', error);
+    logger.error('Error decoding the access token', error);
     return null;
   }
 }
@@ -60,4 +67,16 @@ export async function getIsBackendInitialized() {
   //? Get the backend initialization status
   const { initialized } = await apiBackendInitialized();
   return initialized;
+}
+
+/**
+ * Logout the user
+ */
+export function logout(router: AppRouterInstance) {
+  return () => {
+    //? Logout the user by removing the cookies
+    api.removeTokens();
+    //? Redirect to the login page
+    router.push('/auth/login');
+  };
 }

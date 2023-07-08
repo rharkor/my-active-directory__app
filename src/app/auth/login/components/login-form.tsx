@@ -21,7 +21,7 @@ import { useRouter } from 'next/navigation';
 import { apiLogin } from '@/lib/auth-calls';
 import api from '@/lib/api';
 
-export const registerFormSchema = z.object({
+export const loginFormSchema = z.object({
   username: z
     .string()
     .min(5, {
@@ -30,18 +30,7 @@ export const registerFormSchema = z.object({
     .max(50, {
       message: 'Username must be at most 50 characters long.',
     }),
-  password: z
-    .string()
-    .min(8, {
-      message: 'Password must be at least 8 characters long.',
-    })
-    .max(50, {
-      message: 'Password must be at most 50 characters long.',
-    })
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/,
-      'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character.',
-    ),
+  password: z.string(),
 });
 
 export default function LoginForm() {
@@ -50,15 +39,15 @@ export default function LoginForm() {
   const router = useRouter();
 
   //? Define the form state
-  const form = useForm<z.infer<typeof registerFormSchema>>({
-    resolver: zodResolver(registerFormSchema),
+  const form = useForm<z.infer<typeof loginFormSchema>>({
+    resolver: zodResolver(loginFormSchema),
     defaultValues: {
       username: '',
       password: '',
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof registerFormSchema>) => {
+  const onSubmit = async (values: z.infer<typeof loginFormSchema>) => {
     try {
       //? Submit the form
       setIsSubmitting(true);
@@ -72,13 +61,11 @@ export default function LoginForm() {
         toast({
           title: 'Error',
           description: error,
-          variant: 'destructive',
         });
       } else {
         toast({
           title: 'Error',
           description: 'An unknown error occurred.',
-          variant: 'destructive',
         });
       }
     } finally {
@@ -101,6 +88,7 @@ export default function LoginForm() {
               label="Username"
               placeholder="Username"
               description="Your username."
+              autoComplete="username"
             />
             <FormField
               form={form}
@@ -109,6 +97,7 @@ export default function LoginForm() {
               placeholder="Password"
               description="Your password."
               type="password"
+              autoComplete="current-password"
             />
           </CardContent>
           <CardFooter className="w-full flex justify-end">
@@ -116,7 +105,7 @@ export default function LoginForm() {
               {isSubmitting && (
                 <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
               )}
-              Submit
+              Login
             </Button>
           </CardFooter>
         </Card>

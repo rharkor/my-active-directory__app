@@ -1,18 +1,29 @@
 import urlJoin from 'url-join';
 import { redirect } from 'next/navigation';
-import Cookies from 'universal-cookie';
+import Cookies, { CookieSetOptions } from 'universal-cookie';
 import { ApiError, ApiSchemas } from '@/types/api';
 import * as z from 'zod';
+import { NextResponse } from 'next/server';
+import { logger } from './logger';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 
-const API_URL_SERVER = process.env.API_URL || 'http://localhost:3001';
-const API_URL_CLIENT = '/api';
+const API_URL = process.env.API_URL || '/api';
 
-const _handleRequest = async (res: Response, isLogin = false) => {
+const _handleRequest = async (
+  res: Response,
+  isLogin = false,
+  router?: AppRouterInstance,
+) => {
   //? If the response is not ok, throw the error
   if (!res.ok) {
     //? If the response is a 401, redirect to the login page
     if (res.status === 401 && !isLogin) {
-      redirect('/auth/login');
+      logger.debug('Unauthorized request, redirecting to login page');
+      if (router) {
+        router.push('/auth/login');
+      } else {
+        return redirect('/auth/login');
+      }
     }
     //? Otherwise, throw the error
     let jsonError: ApiError;
@@ -64,41 +75,62 @@ const api = {
   fetch: async (
     path: string,
     options?: RequestInit,
-    fetchFromClient = false,
+    router?: AppRouterInstance,
+    refreshTokens = true,
   ) => {
+    //* Refresh credentials before each request
+    if (refreshTokens)
+      try {
+        //? Refresh the token
+        const tokens = await api.refreshToken(
+          api.getAccessToken(),
+          api.getRefreshToken(),
+        );
+        //? Store the access token in the cookies
+        api.setTokens(tokens);
+      } catch (error) {
+        logger.error(`Error refreshing the token`, error);
+      }
     try {
-      const apiUrl = fetchFromClient ? API_URL_CLIENT : API_URL_SERVER;
+      const apiUrl = API_URL;
 
       //* Modify the headers
       //? Include the access token
-      if (api._accessToken && !_haveAuthorization(options)) {
-        options = {
-          ...options,
-          headers: {
-            ...options?.headers,
-            Authorization: api._accessToken,
-          },
-        };
+      const headers: {
+        [key: string]: string;
+      } = {};
+      const accessToken = api.getAccessToken();
+      if (accessToken && !_haveAuthorization(options)) {
+        headers.Authorization = `Bearer ${accessToken}`;
       }
+
       //? Include the content type
       if (!_haveContentType(options)) {
-        options = {
-          ...options,
-          headers: {
-            ...options?.headers,
-            'Content-Type': 'application/json',
-          },
-        };
+        headers['Content-Type'] = 'application/json';
       }
-      //? Send the request to the API
+
+      //? Include the headers
+      options = {
+        ...options,
+        headers: {
+          ...headers,
+          ...options?.headers,
+        },
+      };
+
       const res = await fetch(urlJoin(apiUrl, path), {
         ...options,
       });
+      logger.debug(`[api] ${path} - ${res.status} ${res.statusText}`);
       //? Handle the response (await because of error handling)
-      const finalResult = await _handleRequest(res, path === '/auth/login');
+      const finalResult = await _handleRequest(
+        res,
+        path === '/auth/login',
+        router,
+      );
       return finalResult;
     } catch (error) {
-      console.error(`Error fetching ${path}`, error);
+      logger.error(`Error fetching ${path}`, error);
       //? If there is an error, throw it
       throw error;
     }
@@ -106,41 +138,94 @@ const api = {
   refreshToken: async (accessToken: string, refreshToken: string) => {
     try {
       //? Send the request to the API
-      const res = await api.fetch('/auth/refresh', {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'x-refresh': refreshToken,
+      const res = (await api.fetch(
+        '/auth/refresh',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'x-refresh': refreshToken,
+          },
         },
-      });
+        undefined,
+        false,
+      )) as z.infer<typeof ApiSchemas.refreshToken.response>;
       return res;
     } catch (error) {
-      console.error(`Error refreshing the token`, error);
+      logger.error(`Error refreshing the token`, error);
       //? If there is an error, throw it
       throw error;
     }
   },
-  setTokens: (tokens: z.infer<typeof ApiSchemas.login.response>) => {
-    //? Store the access token in the cookies
+  getAccessToken: () => {
+    if (api._accessToken) return api._accessToken;
     const cookies = new Cookies();
-
-    //* Set the access token
-    cookies.set('mad-session', tokens.accessToken, {
+    const accessToken = cookies.get('mad-session');
+    if (accessToken) api._accessToken = accessToken;
+    return accessToken;
+  },
+  getRefreshToken: () => {
+    if (api._refreshToken) return api._refreshToken;
+    const cookies = new Cookies();
+    const refreshToken = cookies.get('mad-refresh');
+    if (refreshToken) api._refreshToken = refreshToken;
+    return refreshToken;
+  },
+  setTokens: (
+    tokens: z.infer<typeof ApiSchemas.login.response>,
+    response?: NextResponse<unknown>,
+  ) => {
+    const cookiesOptions: CookieSetOptions = {
       path: '/',
       maxAge: 30 * 24 * 60 * 60, //? 30 days
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-    });
-    api._accessToken = tokens.accessToken;
+    };
 
-    //* Set the refresh token
-    cookies.set('mad-refresh', tokens.refreshToken, {
+    const isClientCookies = !response;
+    if (isClientCookies) {
+      //* Store the access token in the cookies
+      const cookies = new Cookies();
+
+      //? Set the access token
+      cookies.set('mad-session', tokens.accessToken, cookiesOptions);
+      api._accessToken = tokens.accessToken;
+
+      //? Set the refresh token
+      cookies.set('mad-refresh', tokens.refreshToken, cookiesOptions);
+      api._refreshToken = tokens.refreshToken;
+    } else {
+      //* Store the access token in the cookies
+      //? Set the access token
+      response.cookies.set({
+        name: 'mad-session',
+        value: tokens.accessToken,
+        ...cookiesOptions,
+      });
+      api._accessToken = tokens.accessToken;
+
+      //? Set the refresh token
+      response.cookies.set({
+        name: 'mad-refresh',
+        value: tokens.refreshToken,
+        ...cookiesOptions,
+      });
+      api._refreshToken = tokens.refreshToken;
+    }
+  },
+  removeTokens: () => {
+    //* Remove the access token from the cookies
+    const cookies = new Cookies();
+    cookies.remove('mad-session', {
       path: '/',
-      maxAge: 30 * 24 * 60 * 60, //? 30 days
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
     });
-    api._refreshToken = tokens.refreshToken;
+    api._accessToken = '';
+
+    //* Remove the refresh token from the cookies
+    cookies.remove('mad-refresh', {
+      path: '/',
+    });
+    api._refreshToken = '';
   },
 };
 

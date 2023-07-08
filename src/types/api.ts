@@ -69,4 +69,22 @@ export const ApiSchemas = {
       refreshToken: z.string(),
     }),
   },
+  profile: {
+    response: z.object({
+      id: z.number(),
+      email: z.string().email(),
+      username: z.string().min(5).max(50),
+      firstName: z.string().min(2).max(50),
+      lastName: z.string().min(2).max(50),
+      metadata: z.string().nullable(),
+      roles: z.array(
+        z.object({
+          id: z.number(),
+          name: z.string(),
+          displayName: z.string(),
+          description: z.string().nullable(),
+        }),
+      ),
+    }),
+  },
 };

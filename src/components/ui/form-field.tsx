@@ -18,6 +18,7 @@ export default function FormField<T extends z.ZodTypeAny>({
   placeholder,
   description,
   type,
+  autoComplete,
 }: {
   form: UseFormReturn<z.infer<T>>;
   name: Path<z.TypeOf<T>>;
@@ -25,6 +26,7 @@ export default function FormField<T extends z.ZodTypeAny>({
   placeholder: string;
   description: string;
   type?: string;
+  autoComplete?: string;
 }) {
   return (
     <FormFieldComponent
@@ -35,9 +37,18 @@ export default function FormField<T extends z.ZodTypeAny>({
           <FormLabel>{label}</FormLabel>
           <FormControl>
             {type === 'password' ? (
-              <PasswordEyeSlash placeholder={placeholder} {...field} />
+              <PasswordEyeSlash
+                placeholder={placeholder}
+                autoComplete={autoComplete}
+                {...field}
+              />
             ) : (
-              <Input placeholder={placeholder} type={type} {...field} />
+              <Input
+                placeholder={placeholder}
+                type={type}
+                autoComplete={autoComplete}
+                {...field}
+              />
             )}
           </FormControl>
           <FormDescription>{description}</FormDescription>

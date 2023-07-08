@@ -11,7 +11,8 @@ export async function middleware(request: NextRequest) {
   //* Verify the user session
   if (!pathname.startsWith('/auth')) {
     //? Get the sessions
-    const session = getUserSession(request.cookies);
+    const response = NextResponse.next();
+    const session = await getUserSession(request.cookies, response);
     //? Determine where to redirect the user if there is no session
     if (!session) {
       //? redirect to the login page
@@ -21,6 +22,8 @@ export async function middleware(request: NextRequest) {
       });
     }
   }
+
+  return NextResponse.next();
 }
 
 //? Match all paths except /auth/:path* and static assets

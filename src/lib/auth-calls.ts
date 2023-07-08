@@ -1,6 +1,7 @@
 import { ApiSchemas } from '@/types/api';
 import * as z from 'zod';
 import api from './api';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 
 /**
  * Check if the backend is initialized
@@ -40,4 +41,20 @@ export const apiLogin = async (body: z.infer<typeof ApiSchemas.login.body>) => {
     method: 'POST',
     body: JSON.stringify(parsed),
   }) as Promise<z.infer<typeof ApiSchemas.login.response>>;
+};
+
+/**
+ * Get the profile of the user
+ */
+export const apiProfile = async (router: AppRouterInstance) => {
+  //? send the request
+  return api.fetch(
+    '/auth/profile',
+    {
+      next: {
+        revalidate: 60, //? Revalidate the data every minute
+      },
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.profile.response>>;
 };

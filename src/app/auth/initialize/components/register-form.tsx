@@ -79,7 +79,7 @@ export default function LoginForm() {
       setIsSubmitting(true);
       const response = await apiRegisterFirstUser(values);
       //? Set the token in the api client
-      api.setAccessToken(response.access_token);
+      api.setAccessToken(response.accessToken);
       //? Redirect to the home page
       // router.push('/');
     } catch (error) {

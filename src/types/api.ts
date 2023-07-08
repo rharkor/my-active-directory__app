@@ -13,6 +13,25 @@ export type ApiError = {
     | string;
 };
 
+export type Role = {
+  id: number;
+  name: string;
+  displayName: string;
+  description: string | null;
+};
+
+export type TokenDecoded = {
+  id: number;
+  email: string | null;
+  username: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  metadata: string | null;
+  roles?: Role[];
+  iat: number;
+  exp: number;
+};
+
 export const ApiSchemas = {
   initialized: {
     response: z.object({
@@ -30,7 +49,8 @@ export const ApiSchemas = {
         .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/),
     }),
     response: z.object({
-      access_token: z.string(),
+      accessToken: z.string(),
+      refreshToken: z.string(),
     }),
   },
   login: {
@@ -39,7 +59,14 @@ export const ApiSchemas = {
       password: z.string().min(8).max(50),
     }),
     response: z.object({
-      access_token: z.string(),
+      accessToken: z.string(),
+      refreshToken: z.string(),
+    }),
+  },
+  refreshToken: {
+    response: z.object({
+      accessToken: z.string(),
+      refreshToken: z.string(),
     }),
   },
 };

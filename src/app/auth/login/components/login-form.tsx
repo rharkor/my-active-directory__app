@@ -64,7 +64,7 @@ export default function LoginForm() {
       setIsSubmitting(true);
       const response = await apiLogin(values);
       //? Set the token in the api client
-      api.setAccessToken(response.access_token);
+      api.setTokens(response);
       //? Redirect to the home page
       router.push('/');
     } catch (error) {

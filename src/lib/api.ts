@@ -1,7 +1,8 @@
 import urlJoin from 'url-join';
 import { redirect } from 'next/navigation';
 import Cookies from 'universal-cookie';
-import { ApiError } from '@/types/api';
+import { ApiError, ApiSchemas } from '@/types/api';
+import * as z from 'zod';
 
 const API_URL_SERVER = process.env.API_URL || 'http://localhost:3001';
 const API_URL_CLIENT = '/api';
@@ -59,6 +60,7 @@ const _haveContentType = (options?: RequestInit) => {
 
 const api = {
   _accessToken: '',
+  _refreshToken: '',
   fetch: async (
     path: string,
     options?: RequestInit,
@@ -101,15 +103,44 @@ const api = {
       throw error;
     }
   },
-  setAccessToken: (accessToken: string) => {
+  refreshToken: async (accessToken: string, refreshToken: string) => {
+    try {
+      //? Send the request to the API
+      const res = await api.fetch('/auth/refresh', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'x-refresh': refreshToken,
+        },
+      });
+      return res;
+    } catch (error) {
+      console.error(`Error refreshing the token`, error);
+      //? If there is an error, throw it
+      throw error;
+    }
+  },
+  setTokens: (tokens: z.infer<typeof ApiSchemas.login.response>) => {
     //? Store the access token in the cookies
     const cookies = new Cookies();
-    cookies.set('mad-session', accessToken, {
+
+    //* Set the access token
+    cookies.set('mad-session', tokens.accessToken, {
       path: '/',
       maxAge: 30 * 24 * 60 * 60, //? 30 days
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
     });
-    //? Set the access token
-    api._accessToken = accessToken;
+    api._accessToken = tokens.accessToken;
+
+    //* Set the refresh token
+    cookies.set('mad-refresh', tokens.refreshToken, {
+      path: '/',
+      maxAge: 30 * 24 * 60 * 60, //? 30 days
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+    api._refreshToken = tokens.refreshToken;
   },
 };
 

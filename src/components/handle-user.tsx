@@ -1,6 +1,7 @@
 'use client';
 
 import { getUserSession } from '@/lib/auth';
+import { logger } from '@/lib/logger';
 import { redirect, usePathname } from 'next/navigation';
 import Cookies from 'universal-cookie';
 
@@ -15,6 +16,7 @@ export default function HandleUser() {
     //? Determine where to redirect the user if there is no session
     if (!session) {
       //? redirect to the login page
+      logger.debug('[HandleUser] redirect to login page');
       return redirect('/auth/login');
     }
   }

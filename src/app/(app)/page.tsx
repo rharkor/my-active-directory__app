@@ -7,7 +7,7 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center p-24">
       <h1 className="text-6xl font-bold">Welcome to My Active Directory</h1>
       <div className={cn('flex mt-12')}>
-        <Link href="/groups">
+        <Link href="/roles">
           <Button variant="default">Groups</Button>
         </Link>
         <Link href="/service-accounts">

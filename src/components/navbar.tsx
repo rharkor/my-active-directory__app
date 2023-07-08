@@ -50,9 +50,9 @@ export default function Navbar() {
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Link href="/groups" legacyBehavior passHref>
+            <Link href="/roles" legacyBehavior passHref>
               <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Groups
+                Roles
               </NavigationMenuLink>
             </Link>
           </NavigationMenuItem>

@@ -12,7 +12,7 @@ export default function ServiceAccounts() {
         </Link>
         <Link href="/roles">
           <Button variant="default" className="ml-6">
-            Groups
+            Roles
           </Button>
         </Link>
       </div>

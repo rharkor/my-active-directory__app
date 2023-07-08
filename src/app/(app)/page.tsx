@@ -8,7 +8,7 @@ export default function Home() {
       <h1 className="text-6xl font-bold">Welcome to My Active Directory</h1>
       <div className={cn('flex mt-12')}>
         <Link href="/roles">
-          <Button variant="default">Groups</Button>
+          <Button variant="default">Roles</Button>
         </Link>
         <Link href="/service-accounts">
           <Button variant="default" className="ml-6">

@@ -138,7 +138,11 @@ const api = {
       throw error;
     }
   },
-  refreshToken: async (accessToken: string, refreshToken: string) => {
+  refreshToken: async (
+    accessToken: string,
+    refreshToken: string,
+    headers?: HeadersInit,
+  ) => {
     try {
       //? Send the request to the API
       const res = (await api.fetch(
@@ -148,6 +152,7 @@ const api = {
           headers: {
             Authorization: `Bearer ${accessToken}`,
             'x-refresh': refreshToken,
+            ...headers,
           },
         },
         undefined,

@@ -12,7 +12,9 @@ export async function middleware(request: NextRequest) {
   if (!pathname.startsWith('/auth')) {
     //? Get the sessions
     const response = NextResponse.next();
-    const session = await getUserSession(request.cookies, response);
+    const session = await getUserSession(request.cookies, response, {
+      'user-agent': request.headers.get('user-agent') || 'Next.js Middleware',
+    });
     //? Determine where to redirect the user if there is no session
     if (!session) {
       //? redirect to the login page

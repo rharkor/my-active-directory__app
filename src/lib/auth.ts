@@ -15,6 +15,7 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 export async function getUserSession(
   cookies: RequestCookies | Cookies,
   response?: NextResponse<unknown>,
+  headers?: HeadersInit,
 ) {
   //? Get the session from the request
   let session: string | undefined;
@@ -40,7 +41,7 @@ export async function getUserSession(
       //? If there is no refresh token, return null
       if (!refreshToken) return null;
       //? Refresh the token
-      const tokens = await api.refreshToken(session, refreshToken);
+      const tokens = await api.refreshToken(session, refreshToken, headers);
       //? Store the access token in the cookies
       api.setTokens(tokens, response);
     }

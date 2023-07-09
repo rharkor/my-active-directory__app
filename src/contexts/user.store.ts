@@ -12,7 +12,7 @@ interface UserState {
         ? T
         : never)
     | null;
-  loadProfile: (router: AppRouterInstance) => void;
+  loadProfile: (router: AppRouterInstance) => Promise<UserState['profile']>;
 }
 
 export const useUserStore = create<UserState>()(
@@ -24,6 +24,7 @@ export const useUserStore = create<UserState>()(
         //? load the profile
         const profile = await apiProfile(router);
         set({ profile });
+        return profile;
       },
     }),
     {

@@ -20,6 +20,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 import { apiRegisterFirstUser } from '@/lib/auth-calls';
 import api from '@/lib/api';
+import { passwordRegex } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 export const registerFormSchema = z
   .object({
@@ -41,7 +43,7 @@ export const registerFormSchema = z
         message: 'Password must be at most 50 characters long.',
       })
       .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/,
+        passwordRegex,
         'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character.',
       ),
     confirmPassword: z.string(),
@@ -83,6 +85,7 @@ export default function LoginForm() {
       //? Redirect to the home page
       router.push('/');
     } catch (error) {
+      logger.error('Error registering', error);
       if (typeof error === 'string') {
         toast({
           title: 'Error',
@@ -114,6 +117,7 @@ export default function LoginForm() {
               label="Email"
               placeholder="Email"
               description="Your email address."
+              autoComplete="email"
             />
             <FormField
               form={form}
@@ -121,6 +125,7 @@ export default function LoginForm() {
               label="Username"
               placeholder="Username"
               description="Your username."
+              autoComplete="username"
             />
             <FormField
               form={form}
@@ -129,6 +134,7 @@ export default function LoginForm() {
               placeholder="Password"
               description="Your password."
               type="password"
+              autoComplete="new-password"
             />
             <FormField
               form={form}
@@ -137,6 +143,7 @@ export default function LoginForm() {
               placeholder="Confirm Password"
               description="Confirm your password."
               type="password"
+              autoComplete="new-password"
             />
           </CardContent>
           <CardFooter className="w-full flex justify-end">

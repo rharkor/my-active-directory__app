@@ -20,6 +20,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 import { apiLogin } from '@/lib/auth-calls';
 import api from '@/lib/api';
+import { logger } from '@/lib/logger';
 
 export const loginFormSchema = z.object({
   username: z
@@ -57,6 +58,7 @@ export default function LoginForm() {
       //? Redirect to the home page
       router.push('/');
     } catch (error) {
+      logger.error('Error login', error);
       if (typeof error === 'string') {
         toast({
           title: 'Error',

@@ -54,7 +54,6 @@ export default function ProfileForm() {
   //? Update the form values when the profile changes
   useEffect(() => {
     if (profile) {
-      logger.debug('Updating form values with profile', profile);
       form.setValue('id', profile.id.toString());
       form.setValue('firstName', profile.firstName ?? '');
       form.setValue('lastName', profile.lastName ?? '');

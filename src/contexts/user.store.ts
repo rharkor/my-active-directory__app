@@ -3,6 +3,7 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 import { create } from 'zustand';
 import {
   devtools,
+  persist,
   // persist
 } from 'zustand/middleware';
 
@@ -17,19 +18,19 @@ interface UserState {
 
 export const useUserStore = create<UserState>()(
   devtools(
-    // persist(
-    (set) => ({
-      profile: null,
-      loadProfile: async (router: AppRouterInstance) => {
-        //? load the profile
-        const profile = await apiProfile(router);
-        set({ profile });
-        return profile;
+    persist(
+      (set) => ({
+        profile: null,
+        loadProfile: async (router: AppRouterInstance) => {
+          //? load the profile
+          const profile = await apiProfile(router);
+          set({ profile });
+          return profile;
+        },
+      }),
+      {
+        name: 'user-store',
       },
-    }),
-    {
-      name: 'user-store',
-    },
-    // ),
+    ),
   ),
 );

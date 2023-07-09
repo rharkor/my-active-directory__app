@@ -1,6 +1,7 @@
 import { Separator } from '@/components/ui/separator';
 import ProfileForm from '../components/profile-form';
 import EmailForm from '../components/email-form';
+import UsernameForm from '../components/username-form';
 
 export default function Settings() {
   return (
@@ -11,12 +12,14 @@ export default function Settings() {
           You can change your profile information here.
         </p>
       </header>
-      <Separator />
       <ProfileForm />
       <Separator />
       <section>
-        <h3 className="text-lg font-medium">Login &amp; Security</h3>
+        <header>
+          <h3 className="text-lg font-medium">Login &amp; Security</h3>
+        </header>
         <EmailForm />
+        <UsernameForm />
       </section>
     </section>
   );

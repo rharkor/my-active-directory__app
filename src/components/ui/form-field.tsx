@@ -24,7 +24,7 @@ export default function FormField<T extends z.ZodTypeAny>({
   name: Path<z.TypeOf<T>>;
   label: string;
   placeholder: string;
-  description: string;
+  description?: string;
   type?: string;
   autoComplete?: string;
 }) {
@@ -51,7 +51,7 @@ export default function FormField<T extends z.ZodTypeAny>({
               />
             )}
           </FormControl>
-          <FormDescription>{description}</FormDescription>
+          {description && <FormDescription>{description}</FormDescription>}
           <FormMessage />
         </FormItem>
       )}

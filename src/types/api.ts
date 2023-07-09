@@ -56,6 +56,11 @@ export const UserSchema = z.object({
   roles: RoleSchema,
 });
 
+export const TokensSchema = z.object({
+  accessToken: z.string(),
+  refreshToken: z.string(),
+});
+
 export const ApiSchemas = {
   initialized: {
     response: z.object({
@@ -68,26 +73,17 @@ export const ApiSchemas = {
       username: z.string().min(5).max(50),
       password: z.string().min(8).max(50).regex(passwordRegex),
     }),
-    response: z.object({
-      accessToken: z.string(),
-      refreshToken: z.string(),
-    }),
+    response: TokensSchema,
   },
   login: {
     body: z.object({
       username: z.string().min(5).max(50),
       password: z.string().min(8).max(50),
     }),
-    response: z.object({
-      accessToken: z.string(),
-      refreshToken: z.string(),
-    }),
+    response: TokensSchema,
   },
   refreshToken: {
-    response: z.object({
-      accessToken: z.string(),
-      refreshToken: z.string(),
-    }),
+    response: TokensSchema,
   },
   profile: {
     response: UserSchema,
@@ -118,12 +114,17 @@ export const ApiSchemas = {
         .nullable()
         .optional(),
     }),
-    response: UserSchema,
+    response: UserSchema.extend({
+      tokens: TokensSchema,
+    }),
   },
   updatePassword: {
     body: z.object({
+      oldPassword: z.string().min(8).max(50).regex(passwordRegex),
       password: z.string().min(8).max(50).regex(passwordRegex),
     }),
-    response: UserSchema,
+    response: UserSchema.extend({
+      tokens: TokensSchema,
+    }),
   },
 };

@@ -21,23 +21,44 @@ import { Form } from '@/components/ui/form';
 import FormField from '@/components/ui/form-field';
 import { ReloadIcon } from '@radix-ui/react-icons';
 import { ApiSchemas } from '@/types/api';
-import { apiUpdateProfile } from '@/lib/auth-calls';
+import { apiUpdatePassword } from '@/lib/auth-calls';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
 import { DialogClose } from '@radix-ui/react-dialog';
 import api from '@/lib/api';
+import { passwordRegex } from '@/lib/utils';
+import { Separator } from '@/components/ui/separator';
 
-export const usernameFormSchema = z.object({
-  id: z.string(),
-  username: z
-    .string()
-    .min(5, 'Username must be at least 5 characters long.')
-    .max(50, {
-      message: 'Username must be at most 50 characters long.',
-    }),
-});
+export const passwordFormSchema = z
+  .object({
+    id: z.string(),
+    oldPassword: z.string(),
+    password: z
+      .string()
+      .min(8, {
+        message: 'Password must be at least 8 characters long.',
+      })
+      .max(50, {
+        message: 'Password must be at most 50 characters long.',
+      })
+      .regex(
+        passwordRegex,
+        'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character.',
+      ),
+    confirmPassword: z.string(),
+  })
+  .superRefine(({ confirmPassword, password }, ctx) => {
+    if (confirmPassword !== password) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'The passwords did not match',
+        fatal: true,
+        path: ['confirmPassword'],
+      });
+    }
+  });
 
-export default function UsernameForm() {
+export default function PasswordForm() {
   const profile = useUserStore((state) => state.profile);
   const router = useRouter();
   const { toast } = useToast();
@@ -45,11 +66,13 @@ export default function UsernameForm() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   //? Define the form state
-  const form = useForm<z.infer<typeof usernameFormSchema>>({
-    resolver: zodResolver(usernameFormSchema),
+  const form = useForm<z.infer<typeof passwordFormSchema>>({
+    resolver: zodResolver(passwordFormSchema),
     defaultValues: {
       id: profile?.id.toString() ?? '',
-      username: profile?.username ?? '',
+      oldPassword: '',
+      password: '',
+      confirmPassword: '',
     },
   });
 
@@ -57,23 +80,22 @@ export default function UsernameForm() {
   useEffect(() => {
     if (profile) {
       form.setValue('id', profile.id.toString());
-      form.setValue('username', profile.username ?? '');
     }
   }, [profile, form]);
 
-  const onSubmit = async (values: z.infer<typeof usernameFormSchema>) => {
+  const onSubmit = async (values: z.infer<typeof passwordFormSchema>) => {
     try {
       //? Submit the form
       setIsSubmitting(true);
       //? Transform the form values
-      const newValues: z.infer<typeof ApiSchemas.updateProfile.body> =
-        ApiSchemas.updateProfile.body.parse(values);
-      const res = await apiUpdateProfile(values.id, newValues, router);
+      const newValues: z.infer<typeof ApiSchemas.updatePassword.body> =
+        ApiSchemas.updatePassword.body.parse(values);
+      const res = await apiUpdatePassword(values.id, newValues, router);
       //? Set the token in the api client
       api.setTokens(res.tokens);
       toast({
         title: 'Success',
-        description: 'Username updated successfully.',
+        description: 'Password updated successfully.',
         duration: 5000,
       });
       //? Refresh the profile (do not await this)
@@ -81,7 +103,7 @@ export default function UsernameForm() {
       //? Close the dialog
       setIsDialogOpen(false);
     } catch (error) {
-      logger.error('Error updating username', error);
+      logger.error('Error updating password', error);
       if (typeof error === 'string') {
         toast({
           title: 'Error',
@@ -104,9 +126,9 @@ export default function UsernameForm() {
       onOpenChange={(isOpen) => setIsDialogOpen(isOpen)}
     >
       <div className="space-y-2 mt-4">
-        <h4 className="text-sm font-medium text-muted-foreground">Username</h4>
+        <h4 className="text-sm font-medium text-muted-foreground">Password</h4>
         <div className="flex flex-row space-x-4">
-          <Input disabled value={profile?.username ?? ''} />
+          <Input disabled value={'******'} type="password" />
           <DialogTrigger asChild>
             <Button variant="secondary">Change</Button>
           </DialogTrigger>
@@ -118,20 +140,44 @@ export default function UsernameForm() {
               className="space-y-4 flex flex-col"
             >
               <DialogHeader>
-                <DialogTitle>Change Username</DialogTitle>
+                <DialogTitle>Change Password</DialogTitle>
                 <DialogDescription>
-                  Enter your new username below.
+                  Enter your old and new password below.
                 </DialogDescription>
               </DialogHeader>
-              <div className="space-y-4">
-                <FormField
-                  form={form}
-                  name="username"
-                  label="Username"
-                  type="username"
-                  placeholder="Username"
-                  autoComplete="username"
-                />
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <FormField
+                    form={form}
+                    name="oldPassword"
+                    label="Old Password"
+                    type="password"
+                    placeholder="Old Password"
+                    autoComplete="password"
+                    description="Enter your old password."
+                  />
+                </div>
+                <Separator />
+                <div className="space-y-4">
+                  <FormField
+                    form={form}
+                    name="password"
+                    label="Password"
+                    type="password"
+                    placeholder="Password"
+                    autoComplete="password"
+                    description="Enter your new password."
+                  />
+                  <FormField
+                    form={form}
+                    name="confirmPassword"
+                    label="Confirm Password"
+                    type="password"
+                    placeholder="Confirm Password"
+                    autoComplete="password"
+                    description="Confirm your new password."
+                  />
+                </div>
               </div>
               <DialogFooter>
                 <DialogClose asChild>

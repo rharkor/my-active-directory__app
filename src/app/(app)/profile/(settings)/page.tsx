@@ -2,6 +2,7 @@ import { Separator } from '@/components/ui/separator';
 import ProfileForm from '../components/profile-form';
 import EmailForm from '../components/email-form';
 import UsernameForm from '../components/username-form';
+import PasswordForm from '../components/password-form';
 
 export default function Settings() {
   return (
@@ -20,6 +21,7 @@ export default function Settings() {
         </header>
         <EmailForm />
         <UsernameForm />
+        <PasswordForm />
       </section>
     </section>
   );

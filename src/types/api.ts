@@ -120,7 +120,7 @@ export const ApiSchemas = {
   },
   updatePassword: {
     body: z.object({
-      oldPassword: z.string().min(8).max(50).regex(passwordRegex),
+      oldPassword: z.string(), //? No validation here
       password: z.string().min(8).max(50).regex(passwordRegex),
     }),
     response: UserSchema.extend({

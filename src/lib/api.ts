@@ -58,14 +58,16 @@ type CustomHeadersInit = HeadersInit & {
 const _haveAuthorization = (options?: RequestInit) => {
   if (!options) return false;
   if (!options.headers) return false;
-  if (!(options.headers as CustomHeadersInit).Authorization) return false;
+  if ((options.headers as CustomHeadersInit).Authorization === undefined)
+    return false;
   return true;
 };
 
 const _haveContentType = (options?: RequestInit) => {
   if (!options) return false;
   if (!options.headers) return false;
-  if (!(options.headers as CustomHeadersInit)['Content-Type']) return false;
+  if ((options.headers as CustomHeadersInit)['Content-Type'] === undefined)
+    return false;
   return true;
 };
 
@@ -77,6 +79,7 @@ const api = {
     options?: RequestInit,
     router?: AppRouterInstance,
     refreshTokens = true,
+    setContentType = true,
   ) => {
     //* Refresh credentials before each request
     if (refreshTokens)
@@ -105,7 +108,7 @@ const api = {
       }
 
       //? Include the content type
-      if (!_haveContentType(options)) {
+      if (setContentType && !_haveContentType(options)) {
         headers['Content-Type'] = 'application/json';
       }
 

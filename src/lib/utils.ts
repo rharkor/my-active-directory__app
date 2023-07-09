@@ -8,3 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 export function shouldRedirect(from: string, to: string) {
   return from !== to;
 }
+
+export const passwordRegex = new RegExp(
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/,
+);

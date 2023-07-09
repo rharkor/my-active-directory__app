@@ -30,12 +30,6 @@ export async function getUserSession(
     const isExpired = accessToken.exp * 1000 < Date.now();
     if (isExpired) {
       logger.debug('accessToken expired');
-    } else {
-      logger.debug(
-        'accessToken expire in',
-        (accessToken.exp * 1000 - Date.now()) / 1000,
-        'seconds',
-      );
     }
 
     if (isExpired) {

@@ -58,3 +58,66 @@ export const apiProfile = async (router: AppRouterInstance) => {
     router,
   ) as Promise<z.infer<typeof ApiSchemas.profile.response>>;
 };
+
+/**
+ * Upload a file
+ */
+export const apiUploadFile = async (file: File, router: AppRouterInstance) => {
+  //? create a new form data
+  const formData = new FormData();
+  //? append the file to the form data
+  formData.append('file', file);
+  //? send the request
+  return api.fetch(
+    '/uploads/upload',
+    {
+      method: 'POST',
+      body: formData,
+    },
+    router,
+    undefined,
+    false,
+  ) as Promise<z.infer<typeof ApiSchemas.uploadFile.response>>;
+};
+
+/**
+ * Update the profile of the user
+ */
+export const apiUpdateProfile = async (
+  id: string,
+  body: z.infer<typeof ApiSchemas.updateProfile.body>,
+  router: AppRouterInstance,
+) => {
+  //? validate the body against the schema
+  const parsed = ApiSchemas.updateProfile.body.parse(body);
+  //? send the request
+  return api.fetch(
+    `/users/${id}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(parsed),
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.updateProfile.response>>;
+};
+
+/**
+ * Update password
+ */
+export const apiUpdatePassword = async (
+  id: string,
+  body: z.infer<typeof ApiSchemas.updatePassword.body>,
+  router: AppRouterInstance,
+) => {
+  //? validate the body against the schema
+  const parsed = ApiSchemas.updatePassword.body.parse(body);
+  //? send the request
+  return api.fetch(
+    `/users/${id}/password`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(parsed),
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.updatePassword.response>>;
+};

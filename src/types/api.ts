@@ -1,3 +1,4 @@
+import { passwordRegex } from '@/lib/utils';
 import * as z from 'zod';
 
 export type ApiError = {
@@ -32,6 +33,29 @@ export type TokenDecoded = {
   exp: number;
 };
 
+export const RoleSchema = z.array(
+  z.object({
+    id: z.number(),
+    name: z.string(),
+    displayName: z.string(),
+    description: z.string().nullable(),
+  }),
+);
+
+export const UserSchema = z.object({
+  id: z.number(),
+  email: z.string().email(),
+  username: z.string().min(5).max(50),
+  firstName: z.string().min(2).max(50),
+  lastName: z.string().min(2).max(50),
+  metadata: z
+    .object({
+      avatar: z.string().nullable(), //? URL to the avatar
+    })
+    .nullable(),
+  roles: RoleSchema,
+});
+
 export const ApiSchemas = {
   initialized: {
     response: z.object({
@@ -42,11 +66,7 @@ export const ApiSchemas = {
     body: z.object({
       email: z.string().email(),
       username: z.string().min(5).max(50),
-      password: z
-        .string()
-        .min(8)
-        .max(50)
-        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])/),
+      password: z.string().min(8).max(50).regex(passwordRegex),
     }),
     response: z.object({
       accessToken: z.string(),
@@ -70,21 +90,40 @@ export const ApiSchemas = {
     }),
   },
   profile: {
+    response: UserSchema,
+  },
+  uploadFile: {
     response: z.object({
-      id: z.number(),
-      email: z.string().email(),
-      username: z.string().min(5).max(50),
-      firstName: z.string().min(2).max(50),
-      lastName: z.string().min(2).max(50),
-      metadata: z.string().nullable(),
-      roles: z.array(
-        z.object({
-          id: z.number(),
-          name: z.string(),
-          displayName: z.string(),
-          description: z.string().nullable(),
-        }),
-      ),
+      file: z.object({
+        fieldname: z.string(),
+        originalname: z.string(),
+        encoding: z.string(),
+        mimetype: z.string(),
+        size: z.number(),
+        filename: z.string(),
+        path: z.string(),
+      }),
     }),
+  },
+  updateProfile: {
+    body: z.object({
+      email: z.string().email().optional(),
+      username: z.string().min(5).max(50).optional(),
+      firstName: z.string().min(2).max(50).optional(),
+      lastName: z.string().min(2).max(50).optional(),
+      metadata: z
+        .object({
+          avatar: z.string().nullable().optional(), //? URL to the avatar
+        })
+        .nullable()
+        .optional(),
+    }),
+    response: UserSchema,
+  },
+  updatePassword: {
+    body: z.object({
+      password: z.string().min(8).max(50).regex(passwordRegex),
+    }),
+    response: UserSchema,
   },
 };

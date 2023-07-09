@@ -33,12 +33,28 @@ export type TokenDecoded = {
   exp: number;
 };
 
+export const PaginationSchema = z.object({
+  meta: z.object({
+    itemsPerPage: z.number(),
+    totalItems: z.number(),
+    totalPages: z.number(),
+    currentPage: z.number(),
+  }),
+  links: z.object({
+    first: z.string().optional(),
+    previous: z.string().optional(),
+    next: z.string().optional(),
+    last: z.string().optional(),
+    current: z.string(),
+  }),
+});
+
 export const RoleSchema = z.array(
   z.object({
     id: z.number(),
     name: z.string(),
     displayName: z.string(),
-    description: z.string().nullable(),
+    description: z.string().optional(),
   }),
 );
 
@@ -125,6 +141,50 @@ export const ApiSchemas = {
     }),
     response: UserSchema.extend({
       tokens: TokensSchema,
+    }),
+  },
+  getAllTokens: {
+    response: PaginationSchema.extend({
+      data: z.array(
+        z.object({
+          id: z.number(),
+          ua: z.string(),
+          browser: z.object({
+            name: z.string().optional(),
+            version: z.string().optional(),
+            major: z.string().optional(),
+          }),
+          engine: z.object({
+            name: z.string().optional(),
+            version: z.string().optional(),
+          }),
+          os: z.object({
+            /**
+             * Possible 'os.name'
+             * AIX, Amiga OS, Android, Arch, Bada, BeOS, BlackBerry, CentOS, Chromium OS, Contiki,
+             * Fedora, Firefox OS, FreeBSD, Debian, DragonFly, Gentoo, GNU, Haiku, Hurd, iOS,
+             * Joli, Linpus, Linux, Mac OS, Mageia, Mandriva, MeeGo, Minix, Mint, Morph OS, NetBSD,
+             * Nintendo, OpenBSD, OpenVMS, OS/2, Palm, PCLinuxOS, Plan9, Playstation, QNX, RedHat,
+             * RIM Tablet OS, RISC OS, Sailfish, Series40, Slackware, Solaris, SUSE, Symbian, Tizen,
+             * Ubuntu, UNIX, VectorLinux, WebOS, Windows [Phone/Mobile], Zenwalk
+             */
+            name: z.string().optional(),
+            version: z.string().optional(),
+          }),
+          device: z.object({
+            model: z.string().optional(),
+            type: z.string().optional(),
+            vendor: z.string().optional(),
+          }),
+          cpu: z.object({
+            architecture: z.string().optional(),
+          }),
+          lastUsedAt: z.string(),
+          createdAt: z.string(),
+          expiresAt: z.string(),
+          createdByIp: z.string(),
+        }),
+      ),
     }),
   },
 };

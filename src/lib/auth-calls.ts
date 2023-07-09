@@ -8,11 +8,16 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
  */
 export const apiBackendInitialized = async () => {
   //? send the request
-  return api.fetch('/auth/initialized', {
-    next: {
-      revalidate: 120, //? Revalidate the data every 2 minutes
+  return api.fetch(
+    '/auth/initialized',
+    {
+      next: {
+        revalidate: 120, //? Revalidate the data every 2 minutes
+      },
     },
-  }) as Promise<z.infer<typeof ApiSchemas.initialized.response>>;
+    undefined,
+    false,
+  ) as Promise<z.infer<typeof ApiSchemas.initialized.response>>;
 };
 
 /**
@@ -24,10 +29,15 @@ export const apiRegisterFirstUser = async (
   //? validate the body against the schema
   const parsed = ApiSchemas.registerFirstUser.body.parse(body);
   //? send the request
-  return api.fetch('/auth/register/init', {
-    method: 'POST',
-    body: JSON.stringify(parsed),
-  }) as Promise<z.infer<typeof ApiSchemas.registerFirstUser.response>>;
+  return api.fetch(
+    '/auth/register/init',
+    {
+      method: 'POST',
+      body: JSON.stringify(parsed),
+    },
+    undefined,
+    false,
+  ) as Promise<z.infer<typeof ApiSchemas.registerFirstUser.response>>;
 };
 
 /**
@@ -37,10 +47,15 @@ export const apiLogin = async (body: z.infer<typeof ApiSchemas.login.body>) => {
   //? validate the body against the schema
   const parsed = ApiSchemas.login.body.parse(body);
   //? send the request
-  return api.fetch('/auth/login', {
-    method: 'POST',
-    body: JSON.stringify(parsed),
-  }) as Promise<z.infer<typeof ApiSchemas.login.response>>;
+  return api.fetch(
+    '/auth/login',
+    {
+      method: 'POST',
+      body: JSON.stringify(parsed),
+    },
+    undefined,
+    false,
+  ) as Promise<z.infer<typeof ApiSchemas.login.response>>;
 };
 
 /**
@@ -120,4 +135,20 @@ export const apiUpdatePassword = async (
     },
     router,
   ) as Promise<z.infer<typeof ApiSchemas.updatePassword.response>>;
+};
+
+/**
+ * Get all tokens
+ */
+export const apiGetAllTokens = async (router: AppRouterInstance) => {
+  //? send the request
+  return api.fetch(
+    '/auth/tokens',
+    {
+      next: {
+        revalidate: 60, //? Revalidate the data every minute
+      },
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.getAllTokens.response>>;
 };

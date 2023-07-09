@@ -3,10 +3,11 @@ import ProfileForm from '../components/profile-form';
 import EmailForm from '../components/email-form';
 import UsernameForm from '../components/username-form';
 import PasswordForm from '../components/password-form';
+import TokensTable from '../components/tokens-table';
 
 export default function Settings() {
   return (
-    <section className="space-y-6">
+    <section className="space-y-6 mb-8">
       <header>
         <h3 className="text-lg font-medium">Profile</h3>
         <p className="text-sm text-muted-foreground">
@@ -23,6 +24,8 @@ export default function Settings() {
         <UsernameForm />
         <PasswordForm />
       </section>
+      <Separator />
+      <TokensTable />
     </section>
   );
 }

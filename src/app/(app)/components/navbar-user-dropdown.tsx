@@ -8,14 +8,14 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
-import { NavbarAvatar } from './navbar-avatar';
+import ProfileAvatar from '../../../components/profile-avatar';
 import NavbarLogout from './navbar-logout';
 
 export default function NavbarUserDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="mr-6">
-        <NavbarAvatar />
+        <ProfileAvatar />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>My Account</DropdownMenuLabel>

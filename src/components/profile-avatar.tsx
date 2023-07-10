@@ -87,43 +87,46 @@ export default function ProfileAvatar({
     };
 
     return (
-      <div className={cn('relative group flex flex-col gap-4', className)}>
-        <Avatar className={cnExtended}>
-          <AvatarImage
-            src={urlJoin('/api', avatar ?? '')}
-            alt="profile picture"
-          />
-          <AvatarFallback className="group-hover:text-muted-foreground">
-            {avatarFallback}
-          </AvatarFallback>
-          {editable && (
-            <label htmlFor="uploadProfilePicture">
-              <input
-                type="file"
-                className="hidden"
-                accept="image/png, image/jpeg image/jpg"
-                id="uploadProfilePicture"
-                onChange={handleAvatarChange}
-                ref={inputAvatarRef}
-              />
-              <div className="cursor-pointer absolute left-0 top-0 h-full w-full flex flex-col justify-center items-center bg-black bg-opacity-0 group-hover:bg-opacity-50 text-white text-opacity-0 group-hover:text-opacity-100 transition-all duration-300">
-                {avatar ? (
-                  <span className="text-2xl font-bold">Edit</span>
-                ) : (
-                  <UploadIcon className="h-8 w-8" />
-                )}
-              </div>
-            </label>
+      <div className="flex flex-col gap-4">
+        <div className={cn('relative group flex flex-col gap-4', className)}>
+          <Avatar className={cnExtended}>
+            <AvatarImage
+              src={urlJoin('/api', avatar ?? '')}
+              alt="profile picture"
+              className="group-hover:opacity-40 transition-all duration-300"
+            />
+            <AvatarFallback className="group-hover:text-muted-foreground">
+              {avatarFallback}
+            </AvatarFallback>
+            {editable && (
+              <label htmlFor="uploadProfilePicture">
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/png, image/jpeg image/jpg"
+                  id="uploadProfilePicture"
+                  onChange={handleAvatarChange}
+                  ref={inputAvatarRef}
+                />
+                <div className="cursor-pointer absolute left-0 top-0 h-full w-full flex flex-col justify-center items-center text-white text-opacity-0 group-hover:text-opacity-100 transition-all duration-300">
+                  {avatar ? (
+                    <span className="text-2xl font-bold">Edit</span>
+                  ) : (
+                    <UploadIcon className="h-8 w-8" />
+                  )}
+                </div>
+              </label>
+            )}
+          </Avatar>
+          {avatar && (
+            <div
+              className="absolute top-0 right-0 bg-muted w-7 h-7 rounded-full text-destructive flex justify-center items-center opacity-0 group-hover:opacity-100 cursor-pointer hover:bg-accent hover:text-destructive-foreground transition-all duration-300"
+              onClick={handleDeleteAvatar}
+            >
+              <TrashIcon className="h-5 w-5" />
+            </div>
           )}
-        </Avatar>
-        {avatar && (
-          <div
-            className="absolute top-0 right-0 bg-muted w-7 h-7 rounded-full text-destructive flex justify-center items-center opacity-0 group-hover:opacity-100 cursor-pointer hover:bg-accent hover:text-destructive-foreground transition-all duration-300"
-            onClick={handleDeleteAvatar}
-          >
-            <TrashIcon className="h-5 w-5" />
-          </div>
-        )}
+        </div>
         <p className="text-center text-base text-muted-foreground mt-2">
           Your profile picture
         </p>

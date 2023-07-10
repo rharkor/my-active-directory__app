@@ -140,10 +140,16 @@ export const apiUpdatePassword = async (
 /**
  * Get all tokens
  */
-export const apiGetAllTokens = async (router: AppRouterInstance) => {
+export const apiGetAllTokens = async (
+  router: AppRouterInstance,
+  page?: string,
+  itemsPerPage?: string,
+) => {
   //? send the request
   return api.fetch(
-    '/auth/tokens',
+    `/auth/tokens${page ? `?page=${page}` : '?page=1'}${
+      itemsPerPage ? `&limit=${itemsPerPage}` : ''
+    }`,
     {
       next: {
         revalidate: 60, //? Revalidate the data every minute

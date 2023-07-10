@@ -99,7 +99,9 @@ export const ApiSchemas = {
     response: TokensSchema,
   },
   refreshToken: {
-    response: TokensSchema,
+    response: z.object({
+      accessToken: z.string(),
+    }),
   },
   profile: {
     response: UserSchema,
@@ -179,12 +181,17 @@ export const ApiSchemas = {
           cpu: z.object({
             architecture: z.string().optional(),
           }),
-          lastUsedAt: z.string(),
+          lastUsed: z.string(),
           createdAt: z.string(),
           expiresAt: z.string(),
           createdByIp: z.string(),
         }),
       ),
+    }),
+  },
+  revokeToken: {
+    response: z.object({
+      revoked: z.boolean(),
     }),
   },
 };

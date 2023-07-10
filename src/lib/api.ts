@@ -88,6 +88,8 @@ const api = {
         const tokens = await api.refreshToken(
           api.getAccessToken(),
           api.getRefreshToken(),
+          undefined,
+          router,
         );
         //? Store the access token in the cookies
         api.setTokens(tokens);
@@ -142,6 +144,7 @@ const api = {
     accessToken: string,
     refreshToken: string,
     headers?: HeadersInit,
+    router?: AppRouterInstance,
   ) => {
     try {
       //? Send the request to the API
@@ -155,7 +158,7 @@ const api = {
             ...headers,
           },
         },
-        undefined,
+        router,
         false,
       )) as z.infer<typeof ApiSchemas.refreshToken.response>;
       return res;
@@ -180,7 +183,10 @@ const api = {
     return refreshToken;
   },
   setTokens: (
-    tokens: z.infer<typeof ApiSchemas.login.response>,
+    tokens: {
+      accessToken: string;
+      refreshToken?: string;
+    },
     response?: NextResponse<unknown>,
   ) => {
     const cookiesOptions: CookieSetOptions = {
@@ -200,8 +206,10 @@ const api = {
       api._accessToken = tokens.accessToken;
 
       //? Set the refresh token
-      cookies.set('mad-refresh', tokens.refreshToken, cookiesOptions);
-      api._refreshToken = tokens.refreshToken;
+      if (tokens.refreshToken) {
+        cookies.set('mad-refresh', tokens.refreshToken, cookiesOptions);
+        api._refreshToken = tokens.refreshToken;
+      }
     } else {
       //* Store the access token in the cookies
       //? Set the access token
@@ -213,12 +221,14 @@ const api = {
       api._accessToken = tokens.accessToken;
 
       //? Set the refresh token
-      response.cookies.set({
-        name: 'mad-refresh',
-        value: tokens.refreshToken,
-        ...cookiesOptions,
-      });
-      api._refreshToken = tokens.refreshToken;
+      if (tokens.refreshToken) {
+        response.cookies.set({
+          name: 'mad-refresh',
+          value: tokens.refreshToken,
+          ...cookiesOptions,
+        });
+        api._refreshToken = tokens.refreshToken;
+      }
     }
   },
   removeTokens: () => {

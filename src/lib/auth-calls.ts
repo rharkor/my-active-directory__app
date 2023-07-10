@@ -152,3 +152,18 @@ export const apiGetAllTokens = async (router: AppRouterInstance) => {
     router,
   ) as Promise<z.infer<typeof ApiSchemas.getAllTokens.response>>;
 };
+
+/**
+ * Revoke a token
+ */
+export const apiRevokeToken = async (id: string, router: AppRouterInstance) => {
+  //? send the request
+  return api.fetch(
+    `/auth/tokens/${id}`,
+    {
+      method: 'DELETE',
+    },
+    router,
+    false, //? Do not refresh the token because it will recreate it
+  ) as Promise<z.infer<typeof ApiSchemas.revokeToken.response>>;
+};

@@ -32,7 +32,7 @@ const components: { title: string; href: string; description: string }[] = [
 
 export default function Navbar() {
   return (
-    <NavigationMenu className="sticky top-0 z-50 border-b-border border-b p-2 flex flex-row justify-between w-full max-w-none">
+    <NavigationMenu className="sticky top-0 z-50 border-b-border border-b p-2 flex flex-row justify-between w-full max-w-none bg-background">
       <NavigationMenuList>
         <NavigationMenuItem>
           <NavigationMenuTrigger>Components</NavigationMenuTrigger>

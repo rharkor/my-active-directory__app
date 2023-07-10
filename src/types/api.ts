@@ -1,4 +1,4 @@
-import { passwordRegex } from '@/lib/utils';
+import { passwordRegex, slugRegex } from '@/lib/utils';
 import * as z from 'zod';
 
 export type ApiError = {
@@ -49,14 +49,14 @@ export const PaginationSchema = z.object({
   }),
 });
 
-export const RoleSchema = z.array(
-  z.object({
-    id: z.number(),
-    name: z.string(),
-    displayName: z.string(),
-    description: z.string().optional(),
-  }),
-);
+export const RoleSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  displayName: z.string(),
+  description: z.string().optional(),
+});
+
+export const RolesSchema = z.array(RoleSchema);
 
 export const UserSchema = z.object({
   id: z.number(),
@@ -69,7 +69,7 @@ export const UserSchema = z.object({
       avatar: z.string().nullable(), //? URL to the avatar
     })
     .nullable(),
-  roles: RoleSchema,
+  roles: RolesSchema,
 });
 
 export const TokensSchema = z.object({
@@ -193,5 +193,18 @@ export const ApiSchemas = {
     response: z.object({
       revoked: z.boolean(),
     }),
+  },
+  getAllRoles: {
+    response: PaginationSchema.extend({
+      data: RolesSchema,
+    }),
+  },
+  createRole: {
+    body: z.object({
+      name: z.string().regex(slugRegex),
+      displayName: z.string(),
+      description: z.string().optional(),
+    }),
+    response: RoleSchema,
   },
 };

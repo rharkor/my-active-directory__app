@@ -173,3 +173,42 @@ export const apiRevokeToken = async (id: string, router: AppRouterInstance) => {
     false, //? Do not refresh the token because it will recreate it
   ) as Promise<z.infer<typeof ApiSchemas.revokeToken.response>>;
 };
+
+/**
+ * Get all roles
+ */
+export const apiGetAllRoles = async (
+  router: AppRouterInstance,
+  page?: string,
+) => {
+  //? send the request
+  return api.fetch(
+    `/roles${page ? `?page=${page}` : '?page=1'}`,
+    {
+      next: {
+        revalidate: 60, //? Revalidate the data every minute
+      },
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.getAllRoles.response>>;
+};
+
+/**
+ * Create a role
+ */
+export const apiCreateRole = async (
+  body: z.infer<typeof ApiSchemas.createRole.body>,
+  router: AppRouterInstance,
+) => {
+  //? validate the body against the schema
+  const parsed = ApiSchemas.createRole.body.parse(body);
+  //? send the request
+  return api.fetch(
+    `/roles`,
+    {
+      method: 'POST',
+      body: JSON.stringify(parsed),
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.createRole.response>>;
+};

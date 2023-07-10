@@ -37,7 +37,7 @@ type RowProps =
 
 function TokenRow({ token, setSelectedToken, skeleton }: RowProps) {
   return (
-    <div className="grid space-x-4 grid-cols-[1fr,1fr,1fr,1fr,auto] items-center">
+    <div className="grid space-x-4 md:grid-cols-[1fr,1fr,1fr,1fr,auto] items-center">
       <div className="flex flex-col space-y-1">
         <div className="flex flex-row space-x-2">
           <div className="flex flex-col space-y-1">

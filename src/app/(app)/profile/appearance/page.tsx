@@ -5,9 +5,9 @@ export default function Appearance() {
   return (
     <section className="space-y-6">
       <header>
-        <h3 className="text-lg font-medium">Profile</h3>
+        <h3 className="text-lg font-medium">Appearance</h3>
         <p className="text-sm text-muted-foreground">
-          You can change your profile information here.
+          Customize your profile appearance.
         </p>
       </header>
       <Separator />

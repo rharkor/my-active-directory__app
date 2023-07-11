@@ -180,10 +180,13 @@ export const apiRevokeToken = async (id: string, router: AppRouterInstance) => {
 export const apiGetAllRoles = async (
   router: AppRouterInstance,
   page?: string,
+  itemsPerPage?: string,
 ) => {
   //? send the request
   return api.fetch(
-    `/roles${page ? `?page=${page}` : '?page=1'}`,
+    `/roles${page ? `?page=${page}` : '?page=1'}${
+      itemsPerPage ? `&limit=${itemsPerPage}` : ''
+    }`,
     {
       next: {
         revalidate: 60, //? Revalidate the data every minute

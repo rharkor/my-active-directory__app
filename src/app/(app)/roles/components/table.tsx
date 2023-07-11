@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getColumns } from './columns';
 import { DataTable } from './data-table';
 import {
@@ -22,7 +22,11 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import {
+  PaginationState,
+  getCoreRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { ReloadIcon } from '@radix-ui/react-icons';
@@ -33,6 +37,7 @@ import { toast } from '@/components/ui/use-toast';
 import { Form } from '@/components/ui/form';
 import FormField from '@/components/ui/form-field';
 import { cn } from '@/lib/utils';
+import { DataTablePagination } from '@/components/ui/data-table-pagination';
 
 const updateRoleExtended = ApiSchemas.updateRole.body.extend({
   id: z.number(),
@@ -54,8 +59,6 @@ export default function Table() {
   const [roleToEdit, setRoleToEdit] = useState<z.infer<
     typeof updateRoleExtended
   > | null>(null);
-
-  const [isDeletingRole, setIsDeletingRole] = useState(false);
 
   const showNewRoleModal = () => {
     if (newRoleModalMode !== 'create') setNewRoleModalMode('create');
@@ -148,7 +151,6 @@ export default function Table() {
   //? Delete a role
   const deleteRole = (id: number) => async () => {
     try {
-      setIsDeletingRole(true);
       await apiDeleteRole(id.toString(), router);
       toast({
         title: 'Success',
@@ -172,7 +174,6 @@ export default function Table() {
         });
       }
     } finally {
-      setIsDeletingRole(false);
     }
   };
 
@@ -197,18 +198,44 @@ export default function Table() {
   });
 
   //? Define the table state
+  const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 20,
+  });
+
+  const pagination = useMemo(
+    () => ({
+      pageIndex,
+      pageSize,
+    }),
+    [pageIndex, pageSize],
+  );
+
   const table = useReactTable({
     data: roles?.data ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+    pageCount: roles?.meta.totalPages ?? 1,
+    state: {
+      pagination,
+    },
+    onPaginationChange: setPagination,
   });
 
   const [rolesFething, setRolesFetching] = useState(false);
 
-  const fetchRoles = async () => {
+  const fetchRoles = async (
+    pageIndex: number = table.getState().pagination.pageIndex,
+    pageSize: number = table.getState().pagination.pageSize,
+  ) => {
     setRolesFetching(true);
     try {
-      const res = await apiGetAllRoles(router);
+      const res = await apiGetAllRoles(
+        router,
+        (pageIndex + 1).toString(),
+        pageSize.toString(),
+      );
       setRoles(res);
     } finally {
       setRolesFetching(false);
@@ -219,7 +246,7 @@ export default function Table() {
   useEffect(() => {
     fetchRoles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pagination]);
 
   return (
     <div className="rounded-md border border-borderSecondary mt-8">
@@ -242,7 +269,7 @@ export default function Table() {
                 New Role
               </Button>
             </DialogTrigger>
-            <Button className="ml-2" onClick={fetchRoles}>
+            <Button className="ml-2" onClick={() => fetchRoles()}>
               <ReloadIcon
                 className={cn(
                   'w-4 h-4',
@@ -253,6 +280,7 @@ export default function Table() {
           </div>
         </div>
         <DataTable columns={columns} table={table} />
+        <DataTablePagination table={table} />
         <DialogContent>
           <Form {...form}>
             <form

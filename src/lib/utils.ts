@@ -1,3 +1,4 @@
+import { ColumnFiltersState, SortingState } from '@tanstack/react-table';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -85,4 +86,26 @@ export const getTimeBetween = (
   }
   // Construct and return the time elapsed string
   return `${timeValue} ${timeUnit}${timeValue !== 1 ? 's' : ''}`;
+};
+
+export const filtersToQuery = (filters: ColumnFiltersState) => {
+  let query = '';
+  for (const key in filters) {
+    if (filters[key]) {
+      const filter = filters[key];
+      query += `&filter.${filter.id}=$ilike:${filter.value}`;
+    }
+  }
+  return query;
+};
+
+export const sortingToQuery = (sorting: SortingState) => {
+  let query = '';
+  for (const key in sorting) {
+    if (sorting[key]) {
+      const sort = sorting[key];
+      query += `&sortBy=${sort.id}:${sort.desc ? 'DESC' : 'ASC'}`;
+    }
+  }
+  return query;
 };

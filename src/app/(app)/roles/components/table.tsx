@@ -23,7 +23,9 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
+  ColumnFiltersState,
   PaginationState,
+  SortingState,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
@@ -38,6 +40,7 @@ import { Form } from '@/components/ui/form';
 import FormField from '@/components/ui/form-field';
 import { cn } from '@/lib/utils';
 import { DataTablePagination } from '@/components/ui/data-table-pagination';
+import { useDebounce } from 'usehooks-ts';
 
 const updateRoleExtended = ApiSchemas.updateRole.body.extend({
   id: z.number(),
@@ -198,11 +201,13 @@ export default function Table() {
   });
 
   //? Define the table state
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 20,
   });
 
+  const filters = useDebounce(columnFilters, 300);
   const pagination = useMemo(
     () => ({
       pageIndex,
@@ -210,17 +215,24 @@ export default function Table() {
     }),
     [pageIndex, pageSize],
   );
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   const table = useReactTable({
     data: roles?.data ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
-    manualPagination: true,
     pageCount: roles?.meta.totalPages ?? 1,
     state: {
       pagination,
+      columnFilters,
+      sorting,
     },
     onPaginationChange: setPagination,
+    manualPagination: true,
+    onColumnFiltersChange: setColumnFilters,
+    manualFiltering: true,
+    onSortingChange: setSorting,
+    manualSorting: true,
   });
 
   const [rolesFething, setRolesFetching] = useState(false);
@@ -228,6 +240,7 @@ export default function Table() {
   const fetchRoles = async (
     pageIndex: number = table.getState().pagination.pageIndex,
     pageSize: number = table.getState().pagination.pageSize,
+    filters: ColumnFiltersState = table.getState().columnFilters,
   ) => {
     setRolesFetching(true);
     try {
@@ -235,6 +248,8 @@ export default function Table() {
         router,
         (pageIndex + 1).toString(),
         pageSize.toString(),
+        filters,
+        sorting,
       );
       setRoles(res);
     } finally {
@@ -246,10 +261,10 @@ export default function Table() {
   useEffect(() => {
     fetchRoles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination]);
+  }, [pagination, filters, sorting]);
 
   return (
-    <div className="rounded-md border border-borderSecondary mt-8">
+    <div className="rounded-md border border-borderSecondary mt-8 relative">
       <Dialog
         open={newRoleModalIsOpen}
         onOpenChange={(isOpen) => setNewRoleModalIsOpen(isOpen)}
@@ -279,7 +294,7 @@ export default function Table() {
             </Button>
           </div>
         </div>
-        <DataTable columns={columns} table={table} />
+        <DataTable columns={columns} table={table} isLoading={rolesFething} />
         <DataTablePagination table={table} />
         <DialogContent>
           <Form {...form}>

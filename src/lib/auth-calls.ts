@@ -2,6 +2,8 @@ import { ApiSchemas } from '@/types/api';
 import * as z from 'zod';
 import api from './api';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
+import { ColumnFiltersState, SortingState } from '@tanstack/react-table';
+import { filtersToQuery, sortingToQuery } from './utils';
 
 /**
  * Check if the backend is initialized
@@ -181,12 +183,14 @@ export const apiGetAllRoles = async (
   router: AppRouterInstance,
   page?: string,
   itemsPerPage?: string,
+  filters?: ColumnFiltersState,
+  sorting?: SortingState,
 ) => {
   //? send the request
   return api.fetch(
     `/roles${page ? `?page=${page}` : '?page=1'}${
       itemsPerPage ? `&limit=${itemsPerPage}` : ''
-    }`,
+    }${filtersToQuery(filters ?? [])}${sortingToQuery(sorting ?? [])}`,
     {
       next: {
         revalidate: 60, //? Revalidate the data every minute

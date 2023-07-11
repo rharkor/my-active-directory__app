@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { sortableHeader } from '@/components/ui/full-data-table';
 
 export const getColumns: (
   showEditRoleModal: (id: number) => () => void,
@@ -27,21 +28,20 @@ export const getColumns: (
   },
   {
     accessorKey: 'name',
-    header: 'Unique Name',
+    header: sortableHeader('Unique Name'),
   },
   {
     accessorKey: 'displayName',
-    header: 'Display Name',
+    header: sortableHeader('Display Name'),
   },
   {
     accessorKey: 'description',
-    header: 'Description',
+    header: sortableHeader('Description'),
   },
   {
     id: 'actions',
     cell: ({ row }) => {
       const role = row.original;
-
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

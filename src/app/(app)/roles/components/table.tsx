@@ -1,9 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { columns } from './columns';
+import { getColumns } from './columns';
 import { DataTable } from './data-table';
-import { apiCreateRole, apiGetAllRoles } from '@/lib/auth-calls';
+import {
+  apiCreateRole,
+  apiDeleteRole,
+  apiGetAllRoles,
+  apiUpdateRole,
+} from '@/lib/auth-calls';
 import { useRouter } from 'next/navigation';
 import { ApiSchemas } from '@/types/api';
 import * as z from 'zod';
@@ -27,6 +32,11 @@ import { logger } from '@/lib/logger';
 import { toast } from '@/components/ui/use-toast';
 import { Form } from '@/components/ui/form';
 import FormField from '@/components/ui/form-field';
+import { cn } from '@/lib/utils';
+
+const updateRoleExtended = ApiSchemas.updateRole.body.extend({
+  id: z.number(),
+});
 
 export default function Table() {
   const router = useRouter();
@@ -35,37 +45,34 @@ export default function Table() {
   > | null>(null);
 
   const [newRoleModalIsOpen, setNewRoleModalIsOpen] = useState(false);
+  const [newRoleModalMode, setNewRoleModalMode] = useState<'create' | 'edit'>(
+    'create',
+  );
+
   const [isNewRoleModalSubmitting, setIsNewRoleModalSubmitting] =
     useState(false);
+  const [roleToEdit, setRoleToEdit] = useState<z.infer<
+    typeof updateRoleExtended
+  > | null>(null);
 
-  const showNewRoleModal = () => setNewRoleModalIsOpen(true);
+  const [isDeletingRole, setIsDeletingRole] = useState(false);
 
-  //? Define the form state
-  const form = useForm<z.infer<typeof ApiSchemas.createRole.body>>({
-    resolver: zodResolver(ApiSchemas.createRole.body),
-    defaultValues: {
-      name: '',
-      displayName: '',
-      description: '',
-    },
-  });
+  const showNewRoleModal = () => {
+    if (newRoleModalMode !== 'create') setNewRoleModalMode('create');
+    setNewRoleModalIsOpen(true);
+  };
 
-  //? Define the table state
-  const table = useReactTable({
-    data: roles?.data ?? [],
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
-  //? Fetch the roles
-  useEffect(() => {
-    const getRoles = async () => {
-      const res = await apiGetAllRoles(router);
-      setRoles(res);
-    };
-    getRoles();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const showEditRoleModal = (id: number) => () => {
+    if (newRoleModalMode !== 'edit') setNewRoleModalMode('edit');
+    const role = roles?.data.find((r) => r.id === id);
+    if (!role) {
+      logger.error('Could not find role to edit id:' + id);
+      return;
+    }
+    updateForm.reset(role);
+    setRoleToEdit(role);
+    setNewRoleModalIsOpen(true);
+  };
 
   //? Create a new role
   const createRole = async (
@@ -102,6 +109,110 @@ export default function Table() {
     }
   };
 
+  //? Edit a role
+  const editRole = async (
+    id: number,
+    values: z.infer<typeof ApiSchemas.updateRole.body>,
+  ) => {
+    try {
+      setIsNewRoleModalSubmitting(true);
+      await apiUpdateRole(id.toString(), values, router);
+      toast({
+        title: 'Success',
+        description: 'Role updated successfully.',
+        duration: 5000,
+      });
+      //? Refresh the roles
+      const newRoles = await apiGetAllRoles(router);
+      setRoles(newRoles);
+      setNewRoleModalIsOpen(false);
+    } catch (error) {
+      logger.error('Error updating email', error);
+      if (typeof error === 'string') {
+        toast({
+          title: 'Error',
+          description: error,
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: 'An unknown error occurred.',
+        });
+      }
+    } finally {
+      setIsNewRoleModalSubmitting(false);
+      updateForm.reset();
+    }
+  };
+
+  //? Delete a role
+  const deleteRole = (id: number) => async () => {
+    try {
+      setIsDeletingRole(true);
+      await apiDeleteRole(id.toString(), router);
+      toast({
+        title: 'Success',
+        description: 'Role deleted successfully.',
+        duration: 5000,
+      });
+      //? Refresh the roles
+      const newRoles = await apiGetAllRoles(router);
+      setRoles(newRoles);
+    } catch (error) {
+      logger.error('Error updating email', error);
+      if (typeof error === 'string') {
+        toast({
+          title: 'Error',
+          description: error,
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: 'An unknown error occurred.',
+        });
+      }
+    } finally {
+      setIsDeletingRole(false);
+    }
+  };
+
+  const columns = getColumns(showEditRoleModal, deleteRole);
+
+  //? Define the form state
+  const form = useForm<z.infer<typeof ApiSchemas.createRole.body>>({
+    resolver: zodResolver(ApiSchemas.createRole.body),
+    defaultValues: {
+      name: '',
+      displayName: '',
+      description: '',
+    },
+  });
+  const updateForm = useForm<z.infer<typeof ApiSchemas.updateRole.body>>({
+    resolver: zodResolver(ApiSchemas.updateRole.body),
+    defaultValues: {
+      name: roleToEdit?.name ?? '',
+      displayName: roleToEdit?.displayName ?? '',
+      description: roleToEdit?.description ?? '',
+    },
+  });
+
+  //? Define the table state
+  const table = useReactTable({
+    data: roles?.data ?? [],
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
+  //? Fetch the roles
+  useEffect(() => {
+    const getRoles = async () => {
+      const res = await apiGetAllRoles(router);
+      setRoles(res);
+    };
+    getRoles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="rounded-md border border-borderSecondary mt-8">
       <Dialog
@@ -128,7 +239,10 @@ export default function Table() {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(createRole)}
-              className="space-y-4 flex flex-col"
+              className={cn(
+                'space-y-4 flex flex-col',
+                newRoleModalMode === 'create' ? 'block' : 'hidden',
+              )}
             >
               <DialogHeader>
                 <DialogTitle>Create New Role</DialogTitle>
@@ -157,6 +271,65 @@ export default function Table() {
                 />
                 <FormField
                   form={form}
+                  name="description"
+                  label="Description"
+                  type="text"
+                  placeholder="e.g. Administrator"
+                  autoComplete="off"
+                />
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="secondary">Cancel</Button>
+                </DialogClose>
+                <Button type="submit">
+                  {isNewRoleModalSubmitting && (
+                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Save
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+          <Form {...updateForm}>
+            <form
+              onSubmit={updateForm.handleSubmit((values) => {
+                if (roleToEdit) {
+                  editRole(roleToEdit.id, values);
+                } else {
+                  throw new Error('Role to edit is undefined.');
+                }
+              })}
+              className={cn(
+                'space-y-4 flex flex-col',
+                newRoleModalMode === 'edit' ? 'block' : 'hidden',
+              )}
+            >
+              <DialogHeader>
+                <DialogTitle>
+                  Update {roleToEdit?.displayName ?? 'Role'}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <FormField
+                  form={updateForm}
+                  name="name"
+                  label="Unique Name"
+                  type="text"
+                  placeholder="e.g. admin"
+                  autoComplete="off"
+                />
+                <FormField
+                  form={updateForm}
+                  name="displayName"
+                  label="Display Name"
+                  type="text"
+                  placeholder="e.g. Administrator"
+                  autoComplete="off"
+                  description="The name that will be displayed to users."
+                />
+                <FormField
+                  form={updateForm}
                   name="description"
                   label="Description"
                   type="text"

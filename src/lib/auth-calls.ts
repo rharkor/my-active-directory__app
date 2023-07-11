@@ -212,3 +212,38 @@ export const apiCreateRole = async (
     router,
   ) as Promise<z.infer<typeof ApiSchemas.createRole.response>>;
 };
+
+/**
+ * Update a role
+ */
+export const apiUpdateRole = async (
+  id: string,
+  body: z.infer<typeof ApiSchemas.updateRole.body>,
+  router: AppRouterInstance,
+) => {
+  //? validate the body against the schema
+  const parsed = ApiSchemas.updateRole.body.parse(body);
+  //? send the request
+  return api.fetch(
+    `/roles/${id}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(parsed),
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.updateRole.response>>;
+};
+
+/**
+ * Delete a role
+ */
+export const apiDeleteRole = async (id: string, router: AppRouterInstance) => {
+  //? send the request
+  return api.fetch(
+    `/roles/${id}`,
+    {
+      method: 'DELETE',
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.deleteRole.response>>;
+};

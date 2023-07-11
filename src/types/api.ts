@@ -1,4 +1,9 @@
-import { passwordRegex, slugRegex } from '@/lib/utils';
+import {
+  passWordRegexError,
+  passwordRegex,
+  slugRegex,
+  slugRegexError,
+} from '@/lib/utils';
 import * as z from 'zod';
 
 export type ApiError = {
@@ -87,7 +92,11 @@ export const ApiSchemas = {
     body: z.object({
       email: z.string().email(),
       username: z.string().min(5).max(50),
-      password: z.string().min(8).max(50).regex(passwordRegex),
+      password: z
+        .string()
+        .min(8)
+        .max(50)
+        .regex(passwordRegex, passWordRegexError),
     }),
     response: TokensSchema,
   },
@@ -139,7 +148,11 @@ export const ApiSchemas = {
   updatePassword: {
     body: z.object({
       oldPassword: z.string(), //? No validation here
-      password: z.string().min(8).max(50).regex(passwordRegex),
+      password: z
+        .string()
+        .min(8)
+        .max(50)
+        .regex(passwordRegex, passWordRegexError),
     }),
     response: UserSchema.extend({
       tokens: TokensSchema,
@@ -201,10 +214,23 @@ export const ApiSchemas = {
   },
   createRole: {
     body: z.object({
-      name: z.string().regex(slugRegex),
-      displayName: z.string(),
+      name: z.string().nonempty().regex(slugRegex, slugRegexError),
+      displayName: z.string().nonempty(),
       description: z.string().optional(),
     }),
     response: RoleSchema,
+  },
+  updateRole: {
+    body: z.object({
+      name: z.string().regex(slugRegex, slugRegexError).optional(),
+      displayName: z.string().optional(),
+      description: z.string().optional(),
+    }),
+    response: RoleSchema,
+  },
+  deleteRole: {
+    response: z.object({
+      deleted: z.boolean(),
+    }),
   },
 };

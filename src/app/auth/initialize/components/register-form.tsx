@@ -20,7 +20,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 import { apiRegisterFirstUser } from '@/lib/auth-calls';
 import api from '@/lib/api';
-import { passwordRegex } from '@/lib/utils';
+import { passWordRegexError, passwordRegex } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 
 export const registerFormSchema = z
@@ -42,10 +42,7 @@ export const registerFormSchema = z
       .max(50, {
         message: 'Password must be at most 50 characters long.',
       })
-      .regex(
-        passwordRegex,
-        'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character.',
-      ),
+      .regex(passwordRegex, passWordRegexError),
     confirmPassword: z.string(),
   })
   .superRefine(({ confirmPassword, password }, ctx) => {

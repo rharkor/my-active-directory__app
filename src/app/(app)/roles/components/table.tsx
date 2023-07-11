@@ -203,13 +203,21 @@ export default function Table() {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  //? Fetch the roles
-  useEffect(() => {
-    const getRoles = async () => {
+  const [rolesFething, setRolesFetching] = useState(false);
+
+  const fetchRoles = async () => {
+    setRolesFetching(true);
+    try {
       const res = await apiGetAllRoles(router);
       setRoles(res);
-    };
-    getRoles();
+    } finally {
+      setRolesFetching(false);
+    }
+  };
+
+  //? Fetch the roles
+  useEffect(() => {
+    fetchRoles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -228,11 +236,21 @@ export default function Table() {
             }
             className="max-w-sm"
           />
-          <DialogTrigger asChild>
-            <Button variant="default" onClick={showNewRoleModal}>
-              New Role
+          <div className="flex">
+            <DialogTrigger asChild>
+              <Button variant="default" onClick={showNewRoleModal}>
+                New Role
+              </Button>
+            </DialogTrigger>
+            <Button className="ml-2" onClick={fetchRoles}>
+              <ReloadIcon
+                className={cn(
+                  'w-4 h-4',
+                  rolesFething && roles !== null && 'animate-spin',
+                )}
+              />
             </Button>
-          </DialogTrigger>
+          </div>
         </div>
         <DataTable columns={columns} table={table} />
         <DialogContent>

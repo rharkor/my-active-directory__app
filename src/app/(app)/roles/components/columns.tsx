@@ -1,10 +1,11 @@
 'use client';
 
-import * as z from 'zod';
-import { RoleSchema } from '@/types/api';
-import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ApiSchemas, RoleSchema } from '@/types/api';
+
+import {
+  ColumnDefExtended,
+  sortableHeader,
+} from '@/components/ui/data-table-full';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,15 +14,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { sortableHeader } from '@/components/ui/full-data-table';
+import { Button } from '@/components/ui/button';
+import { MoreHorizontal } from 'lucide-react';
 
 export const getColumns: (
   showEditRoleModal: (id: number) => () => void,
   deleteRole: (id: number) => () => Promise<void>,
-) => ColumnDef<z.infer<typeof RoleSchema>>[] = (
-  showEditRoleModal,
-  deleteRole,
-) => [
+) => ColumnDefExtended<
+  typeof RoleSchema,
+  typeof ApiSchemas.createRole.body,
+  typeof ApiSchemas.updateRole.body
+>[] = (showEditRoleModal, deleteRole) => [
   {
     accessorKey: 'id',
     header: 'Id',
@@ -29,19 +32,43 @@ export const getColumns: (
   {
     accessorKey: 'name',
     header: sortableHeader('Unique Name'),
+    type: 'text',
+    name: 'name',
+    label: 'Unique Name',
+    placeholder: 'e.g. admin',
+    autoComplete: 'off',
+    create: {
+      defaultValue: '',
+    },
   },
   {
     accessorKey: 'displayName',
     header: sortableHeader('Display Name'),
+    type: 'text',
+    name: 'displayName',
+    label: 'Display Name',
+    placeholder: 'e.g. Administrator',
+    autoComplete: 'off',
+    create: {
+      defaultValue: '',
+    },
   },
   {
     accessorKey: 'description',
     header: sortableHeader('Description'),
+    type: 'text',
+    name: 'description',
+    label: 'Description',
+    autoComplete: 'off',
+    placeholder: 'e.g. My app admins',
+    create: {
+      defaultValue: '',
+    },
   },
   {
     id: 'actions',
     cell: ({ row }) => {
-      const role = row.original;
+      const role = row.original as Zod.TypeOf<typeof RoleSchema>;
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

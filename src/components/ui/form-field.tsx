@@ -11,6 +11,16 @@ import * as z from 'zod';
 import { Input } from '@/components/ui/input';
 import { PasswordEyeSlash } from '@/components/ui/password-eye-slash';
 
+export type FormFieldProps<T extends z.ZodTypeAny> = {
+  form: UseFormReturn<z.infer<T>>;
+  name: Path<z.TypeOf<T>>;
+  label: string;
+  placeholder?: string;
+  description?: string;
+  type?: string;
+  autoComplete?: string;
+};
+
 export default function FormField<T extends z.ZodTypeAny>({
   form,
   name,
@@ -19,15 +29,7 @@ export default function FormField<T extends z.ZodTypeAny>({
   description,
   type,
   autoComplete,
-}: {
-  form: UseFormReturn<z.infer<T>>;
-  name: Path<z.TypeOf<T>>;
-  label: string;
-  placeholder: string;
-  description?: string;
-  type?: string;
-  autoComplete?: string;
-}) {
+}: FormFieldProps<T>) {
   return (
     <FormFieldComponent
       control={form.control}

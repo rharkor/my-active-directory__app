@@ -52,6 +52,7 @@ export const PaginationSchema = z.object({
     last: z.string().optional(),
     current: z.string(),
   }),
+  data: z.array(z.any()),
 });
 
 export const RoleSchema = z.object({

@@ -21,6 +21,8 @@ import {
 } from '@/components/ui/popover';
 import { InputProps } from '@/components/ui/input';
 import { Cross2Icon } from '@radix-ui/react-icons';
+import * as z from 'zod';
+import { UseFormReturn } from 'react-hook-form';
 
 const badgeStyle = (color: string) => ({
   borderColor: `${color}20`,
@@ -39,6 +41,7 @@ export type FancyBoxProps = {
   items: FancyBoxItem[];
   placeholder?: string;
   commandPlaceholder?: string;
+  form: UseFormReturn<z.infer<z.ZodTypeAny>>;
 };
 
 export const FancyBox = React.forwardRef<HTMLInputElement, FancyBoxProps>(
@@ -51,12 +54,14 @@ export const FancyBox = React.forwardRef<HTMLInputElement, FancyBoxProps>(
     );
 
     const toggleFramework = (item: FancyBoxItem) => {
-      setSelectedValues((currentItems) =>
-        !currentItems.includes(item)
-          ? [...currentItems, item]
-          : currentItems.filter((i) => i.value !== item.value),
+      const newItems = !selectedValues.includes(item)
+        ? [...selectedValues, item]
+        : selectedValues.filter((i) => i.value !== item.value);
+      setSelectedValues(newItems);
+      props.form.setValue(
+        props.inputProps.name ?? '',
+        newItems.map((i) => i.value),
       );
-      // inputRef?.current?.focus();
     };
 
     const onComboboxOpenChange = (value: boolean) => {

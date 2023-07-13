@@ -317,7 +317,7 @@ export const apiCreateUser = async (
   const parsed = ApiSchemas.createUser.body.parse(body);
   //? send the request
   return api.fetch(
-    `/users`,
+    `/auth/register`,
     {
       method: 'POST',
       body: JSON.stringify(parsed),

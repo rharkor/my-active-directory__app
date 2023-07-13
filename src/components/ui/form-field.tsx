@@ -27,9 +27,10 @@ function getInner<T extends z.ZodTypeAny>({
   autoComplete,
   placeholder,
   type,
+  form,
 }: FormFieldProps<T> & { field: ControllerRenderProps<z.TypeOf<T>> }) {
   if (type === 'role-box') {
-    return <RoleBox placeholder={placeholder} {...field} />;
+    return <RoleBox placeholder={placeholder} form={form} inputProps={field} />;
   } else if (type === 'password') {
     return (
       <PasswordEyeSlash

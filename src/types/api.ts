@@ -262,23 +262,61 @@ export const ApiSchemas = {
   },
   createUser: {
     body: z.object({
-      email: z.string().email().optional(),
-      username: z.string().min(5).max(50).optional(),
-      firstName: z.string().min(2).max(50).optional(),
-      lastName: z.string().min(2).max(50).optional(),
+      email: z
+        .string()
+        .email()
+        .optional()
+        .transform((v) => (v === '' ? undefined : v)),
+      username: z
+        .string()
+        .min(5)
+        .max(50)
+        .optional()
+        .transform((v) => (v === '' ? undefined : v)),
+      firstName: z
+        .string()
+        .min(2)
+        .max(50)
+        .optional()
+        .transform((v) => (v === '' ? undefined : v)),
+      lastName: z
+        .string()
+        .min(2)
+        .max(50)
+        .optional()
+        .transform((v) => (v === '' ? undefined : v)),
       metadata: z.any().optional(),
-      roles: z.array(z.number()).optional(),
+      roles: z.array(z.string()).optional(),
     }),
     response: UserSchema,
   },
   updateUser: {
     body: z.object({
-      email: z.string().email().optional(),
-      username: z.string().min(5).max(50).optional(),
-      firstName: z.string().min(2).max(50).optional(),
-      lastName: z.string().min(2).max(50).optional(),
+      email: z
+        .string()
+        .email()
+        .optional()
+        .transform((v) => (v === '' ? undefined : v)),
+      username: z
+        .string()
+        .min(5)
+        .max(50)
+        .optional()
+        .transform((v) => (v === '' ? undefined : v)),
+      firstName: z
+        .string()
+        .min(2)
+        .max(50)
+        .optional()
+        .transform((v) => (v === '' ? undefined : v)),
+      lastName: z
+        .string()
+        .min(2)
+        .max(50)
+        .optional()
+        .transform((v) => (v === '' ? undefined : v)),
       metadata: z.any().optional(),
-      roles: z.array(z.number()).optional(),
+      roles: z.array(z.string()).optional(),
     }),
     response: UserSchema,
   },

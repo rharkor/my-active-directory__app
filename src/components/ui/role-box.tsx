@@ -2,20 +2,25 @@
 
 import { apiGetAllRolesWithoutPagination } from '@/lib/auth-calls';
 import { FancyBox, FancyBoxItem } from './fancy-box';
-
+import * as z from 'zod';
 import { InputProps } from './input';
 import React, { useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { UseFormReturn } from 'react-hook-form';
 
 export const RoleBox = React.forwardRef<
   HTMLInputElement,
-  InputProps & {
+  {
+    inputProps: InputProps;
     placeholder?: string;
+    form: UseFormReturn<z.infer<z.ZodTypeAny>>;
   }
 >(
   (
-    field: InputProps & {
+    field: {
+      inputProps: InputProps;
       placeholder?: string;
+      form: UseFormReturn<z.infer<z.ZodTypeAny>>;
     },
     ref,
   ) => {
@@ -41,7 +46,8 @@ export const RoleBox = React.forwardRef<
       <FancyBox
         ref={ref}
         items={roles}
-        inputProps={field}
+        inputProps={field.inputProps}
+        form={field.form}
         placeholder="Select a role"
         commandPlaceholder="Search roles by name"
       />

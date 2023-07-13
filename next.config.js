@@ -7,6 +7,15 @@ const nextConfig = {
       destination: process.env.API_URL + '/:path*',
     },
   ],
+  redirects: async () => {
+    return [
+      {
+        source: '/users',
+        destination: '/',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

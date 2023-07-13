@@ -6,6 +6,7 @@ import {
   HeaderContext,
   PaginationState,
   SortingState,
+  VisibilityState,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
@@ -43,11 +44,15 @@ export type ColumnDefExtended<
   TData extends z.AnyZodObject,
   TCreateSchema extends z.AnyZodObject,
   TUpdateSchema extends z.AnyZodObject,
-> = ColumnDef<z.TypeOf<TData>> & {
+  TValue = unknown,
+> = ColumnDef<z.TypeOf<TData>, TValue> & {
   create?: Partial<Omit<FormFieldProps<TCreateSchema>, 'form'>> & {
     defaultValue?: unknown;
   };
-  update?: Partial<Omit<FormFieldProps<TUpdateSchema>, 'form'>>;
+  update?: Partial<Omit<FormFieldProps<TUpdateSchema>, 'form'>> & {
+    defaultValue?: unknown;
+  };
+  forceHidden?: boolean;
 } & Partial<Omit<FormFieldProps<TCreateSchema>, 'form'>>;
 
 export const sortableHeader = <T,>(headerName: string) =>
@@ -81,10 +86,11 @@ const renderFormField = <TData extends z.AnyZodObject>(
   //? If one of the required props is missing, we don't render the form field
   if (!column || !column.name || !column.label || !column.type) {
     //? If one of the props is present, we log an error
-    if (column && (column.name || column.label || column.type))
+    if (column && (column.label || column.type))
       logger.error('Missing column props on', column);
     return null;
   }
+
   return (
     <FormField
       form={form}
@@ -144,6 +150,7 @@ export interface DataTableFullProps<
   createRowButtonText: string;
   createRowModalTitle: string;
   createRowModalDescription?: string;
+  onRowsFetched?: (rows: z.infer<TRowType>) => z.TypeOf<TRowType>;
 }
 
 export default function DataTableFull<
@@ -171,6 +178,7 @@ export default function DataTableFull<
   createRowButtonText,
   createRowModalTitle,
   createRowModalDescription,
+  onRowsFetched,
 }: DataTableFullProps<TRowType, TCreateSchema, TUpdateSchema>) {
   const router = useRouter();
   //? Rows
@@ -318,6 +326,17 @@ export default function DataTableFull<
   });
   const updateForm = useForm<z.infer<typeof updateSchema>>({
     resolver: zodResolver(updateSchema),
+    defaultValues: columns.reduce<DeepPartial<z.infer<typeof updateSchema>>>(
+      (acc, col) => {
+        if (col.update && col.update.defaultValue !== undefined && col.name) {
+          acc[col.name] = col.update.defaultValue as DeepPartial<
+            z.infer<typeof updateSchema>
+          >[Path<z.infer<typeof updateSchema>>];
+        }
+        return acc;
+      },
+      {} as DeepPartial<z.infer<typeof updateSchema>>,
+    ),
   });
 
   //? Define the table state
@@ -336,6 +355,7 @@ export default function DataTableFull<
     [pageIndex, pageSize],
   );
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
   const table = useReactTable({
     data: rows?.data ?? [],
@@ -346,6 +366,7 @@ export default function DataTableFull<
       pagination,
       columnFilters,
       sorting,
+      columnVisibility,
     },
     onPaginationChange: setPagination,
     manualPagination: true,
@@ -353,7 +374,27 @@ export default function DataTableFull<
     manualFiltering: true,
     onSortingChange: setSorting,
     manualSorting: true,
+    onColumnVisibilityChange: setColumnVisibility,
   });
+
+  //? Hide column marked as forceHidden
+  const hideForceHiddenColumns = () => {
+    const forceHiddenColumns = columns.filter((c) => c.forceHidden);
+    if (forceHiddenColumns.length > 0) {
+      table.getAllColumns().forEach((c) => {
+        if (
+          c.getIsVisible() &&
+          forceHiddenColumns.some((f) => f.name === c.id)
+        ) {
+          c.toggleVisibility(false);
+        }
+      });
+    }
+  };
+  useEffect(() => {
+    hideForceHiddenColumns();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [rowsFething, setRowsFetching] = useState(false);
 
@@ -364,13 +405,16 @@ export default function DataTableFull<
   ) => {
     setRowsFetching(true);
     try {
-      const res = (await apiGetAllRows(
+      let res = (await apiGetAllRows(
         router,
         (pageIndex + 1).toString(),
         pageSize.toString(),
         filters,
         sorting,
       )) as z.infer<TRowType>;
+      if (onRowsFetched) {
+        res = onRowsFetched(res);
+      }
       setRows(res);
     } finally {
       setRowsFetching(false);

@@ -191,11 +191,7 @@ export const apiGetAllRoles = async (
     `/roles${page ? `?page=${page}` : '?page=1'}${
       itemsPerPage ? `&limit=${itemsPerPage}` : ''
     }${filtersToQuery(filters ?? [])}${sortingToQuery(sorting ?? [])}`,
-    {
-      next: {
-        revalidate: 60, //? Revalidate the data every minute
-      },
-    },
+    undefined,
     router,
   ) as Promise<z.infer<typeof ApiSchemas.getAllRoles.response>>;
 };
@@ -253,4 +249,102 @@ export const apiDeleteRole = async (id: string, router: AppRouterInstance) => {
     },
     router,
   ) as Promise<z.infer<typeof ApiSchemas.deleteRole.response>>;
+};
+
+/**
+ * Get all users
+ */
+export const apiGetAllUsers = async (
+  router: AppRouterInstance,
+  page?: string,
+  itemsPerPage?: string,
+  filters?: ColumnFiltersState,
+  sorting?: SortingState,
+) => {
+  //? send the request
+  return api.fetch(
+    `/users${page ? `?page=${page}` : '?page=1'}${
+      itemsPerPage ? `&limit=${itemsPerPage}` : ''
+    }${filtersToQuery(filters ?? [])}${sortingToQuery(sorting ?? [])}`,
+    undefined,
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.getAllUsers.response>>;
+};
+
+/**
+ * Get one user
+ */
+export const apiGetUser = async (id: string, router: AppRouterInstance) => {
+  //? send the request
+  return api.fetch(`/users/${id}`, undefined, router) as Promise<
+    z.infer<typeof ApiSchemas.getOneUser.response>
+  >;
+};
+
+/**
+ * Get user's roles
+ */
+export const apiGetUserRoles = async (
+  id: string,
+  router: AppRouterInstance,
+) => {
+  //? send the request
+  return api.fetch(`/users/${id}/roles`, undefined, router) as Promise<
+    z.infer<typeof ApiSchemas.getUserRoles.response>
+  >;
+};
+
+/**
+ * Create a user
+ */
+export const apiCreateUser = async (
+  body: z.infer<typeof ApiSchemas.createUser.body>,
+  router: AppRouterInstance,
+) => {
+  //? validate the body against the schema
+  const parsed = ApiSchemas.createUser.body.parse(body);
+  //? send the request
+  return api.fetch(
+    `/users`,
+    {
+      method: 'POST',
+      body: JSON.stringify(parsed),
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.createUser.response>>;
+};
+
+/**
+ * Update a user
+ */
+export const apiUpdateUser = async (
+  id: string,
+  body: z.infer<typeof ApiSchemas.updateUser.body>,
+  router: AppRouterInstance,
+) => {
+  //? validate the body against the schema
+  const parsed = ApiSchemas.updateUser.body.parse(body);
+  //? send the request
+  return api.fetch(
+    `/users/${id}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(parsed),
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.updateUser.response>>;
+};
+
+/**
+ * Delete a user
+ */
+export const apiDeleteUser = async (id: string, router: AppRouterInstance) => {
+  //? send the request
+  return api.fetch(
+    `/users/${id}`,
+    {
+      method: 'DELETE',
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.deleteUser.response>>;
 };

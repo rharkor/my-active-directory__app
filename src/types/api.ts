@@ -24,6 +24,7 @@ export type Role = {
   name: string;
   displayName: string;
   description: string | null;
+  deletable: boolean;
 };
 
 export type TokenDecoded = {
@@ -60,6 +61,8 @@ export const RoleSchema = z.object({
   name: z.string(),
   displayName: z.string(),
   description: z.string().optional(),
+  color: z.string().optional(),
+  deletable: z.boolean(),
 });
 
 export const RolesSchema = z.array(RoleSchema);
@@ -76,7 +79,10 @@ export const UserSchema = z.object({
     })
     .nullable(),
   roles: RolesSchema,
+  activeRoles: z.number(),
 });
+
+export const UsersSchema = z.array(UserSchema);
 
 export const TokensSchema = z.object({
   accessToken: z.string(),
@@ -218,6 +224,7 @@ export const ApiSchemas = {
       name: z.string().nonempty().regex(slugRegex, slugRegexError),
       displayName: z.string().nonempty(),
       description: z.string().optional(),
+      color: z.string().optional(),
     }),
     response: RoleSchema,
   },
@@ -226,10 +233,51 @@ export const ApiSchemas = {
       name: z.string().regex(slugRegex, slugRegexError).optional(),
       displayName: z.string().optional(),
       description: z.string().optional(),
+      color: z.string().optional(),
     }),
     response: RoleSchema,
   },
   deleteRole: {
+    response: z.object({
+      deleted: z.boolean(),
+    }),
+  },
+  getAllUsers: {
+    response: PaginationSchema.extend({
+      data: UsersSchema,
+    }),
+  },
+  getOneUser: {
+    response: UserSchema,
+  },
+  getUserRoles: {
+    response: PaginationSchema.extend({
+      data: RolesSchema,
+    }),
+  },
+  createUser: {
+    body: z.object({
+      email: z.string().email().optional(),
+      username: z.string().min(5).max(50).optional(),
+      firstName: z.string().min(2).max(50).optional(),
+      lastName: z.string().min(2).max(50).optional(),
+      metadata: z.any().optional(),
+      roles: z.array(z.number()).optional(),
+    }),
+    response: UserSchema,
+  },
+  updateUser: {
+    body: z.object({
+      email: z.string().email().optional(),
+      username: z.string().min(5).max(50).optional(),
+      firstName: z.string().min(2).max(50).optional(),
+      lastName: z.string().min(2).max(50).optional(),
+      metadata: z.any().optional(),
+      roles: z.array(z.number()).optional(),
+    }),
+    response: UserSchema,
+  },
+  deleteUser: {
     response: z.object({
       deleted: z.boolean(),
     }),

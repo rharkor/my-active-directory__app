@@ -1,6 +1,6 @@
 'use client';
 
-import { ColumnDef, Table as TTable, flexRender } from '@tanstack/react-table';
+import { Table as TTable, flexRender } from '@tanstack/react-table';
 
 import {
   Table,
@@ -11,18 +11,33 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import IndeterminateProgressBar from '@/components/ui/indetermine-progress-bar';
+import { ColumnDefExtended } from './data-table-full';
+import * as z from 'zod';
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+interface DataTableProps<
+  TData extends z.AnyZodObject,
+  TCreateSchema extends z.AnyZodObject,
+  TUpdateSchema extends z.AnyZodObject,
+  TValue,
+> {
+  columns: ColumnDefExtended<TData, TCreateSchema, TUpdateSchema, TValue>[];
   table: TTable<TData>;
   isLoading?: boolean;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<
+  TData extends z.AnyZodObject,
+  TCreateSchema extends z.AnyZodObject,
+  TUpdateSchema extends z.AnyZodObject,
+  TValue,
+>({
   columns,
   table,
   isLoading,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TData, TCreateSchema, TUpdateSchema, TValue>) {
+  const headers = table.getHeaderGroups();
+  const rows = table.getRowModel().rows;
+
   return (
     <>
       <div className="absolute w-full">
@@ -30,7 +45,7 @@ export function DataTable<TData, TValue>({
       </div>
       <Table>
         <TableHeader className="border-borderSecondary">
-          {table.getHeaderGroups().map((headerGroup) => (
+          {headers.map((headerGroup) => (
             <TableRow key={headerGroup.id} className="border-borderSecondary">
               {headerGroup.headers.map((header) => {
                 return (
@@ -48,16 +63,25 @@ export function DataTable<TData, TValue>({
           ))}
         </TableHeader>
         <TableBody className="border-borderSecondary">
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
+          {rows?.length ? (
+            rows.map((row) => (
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && 'selected'}
                 className="border-borderSecondary"
               >
-                {row.getVisibleCells().map((cell) => (
+                {row.getVisibleCells().map((cell, i) => (
                   <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    {columns[i].type === 'color' ? (
+                      <div
+                        className="w-4 h-4 rounded-full"
+                        style={{
+                          backgroundColor: cell.getValue() as string,
+                        }}
+                      />
+                    ) : (
+                      flexRender(cell.column.columnDef.cell, cell.getContext())
+                    )}
                   </TableCell>
                 ))}
               </TableRow>

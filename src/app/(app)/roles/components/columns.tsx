@@ -66,6 +66,20 @@ export const getColumns: (
     },
   },
   {
+    accessorKey: 'color',
+    header: 'Color',
+    type: 'color',
+    name: 'color',
+    label: 'Color',
+    placeholder: 'e.g. #000000',
+    create: {
+      defaultValue: '#000000',
+    },
+    update: {
+      defaultValue: '#000000',
+    },
+  },
+  {
     id: 'actions',
     cell: ({ row }) => {
       const role = row.original as Zod.TypeOf<typeof RoleSchema>;

@@ -1,11 +1,7 @@
 import { apiProfile } from '@/lib/auth-calls';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 import { create } from 'zustand';
-import {
-  devtools,
-  persist,
-  // persist
-} from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
 
 interface UserState {
   profile:

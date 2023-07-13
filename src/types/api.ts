@@ -219,6 +219,11 @@ export const ApiSchemas = {
       data: RolesSchema,
     }),
   },
+  getAllRolesNoPagination: {
+    response: z.object({
+      data: RolesSchema,
+    }),
+  },
   createRole: {
     body: z.object({
       name: z.string().nonempty().regex(slugRegex, slugRegexError),

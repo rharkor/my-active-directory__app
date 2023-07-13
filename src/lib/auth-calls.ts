@@ -197,6 +197,18 @@ export const apiGetAllRoles = async (
 };
 
 /**
+ * Get all roles without pagination
+ */
+export const apiGetAllRolesWithoutPagination = async (
+  router: AppRouterInstance,
+) => {
+  //? send the request
+  return api.fetch(`/roles/no-pagination`, undefined, router) as Promise<
+    z.infer<typeof ApiSchemas.getAllRolesNoPagination.response>
+  >;
+};
+
+/**
  * Create a role
  */
 export const apiCreateRole = async (

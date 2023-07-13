@@ -229,6 +229,7 @@ export default function DataTableFull<
       //? Refresh the rows
       await refreshRows();
       setRowModalIsOpen(false);
+      createForm.reset();
     } catch (error) {
       logger.error(createRowErrorMessage, error);
       if (typeof error === 'string') {
@@ -244,7 +245,6 @@ export default function DataTableFull<
       }
     } finally {
       setIsRowModalSubmitting(false);
-      createForm.reset();
     }
   };
 
@@ -261,6 +261,7 @@ export default function DataTableFull<
       //? Refresh the rows
       await refreshRows();
       setRowModalIsOpen(false);
+      updateForm.reset();
     } catch (error) {
       logger.error(updateRowErrorMessage, error);
       if (typeof error === 'string') {
@@ -276,7 +277,6 @@ export default function DataTableFull<
       }
     } finally {
       setIsRowModalSubmitting(false);
-      updateForm.reset();
     }
   };
 

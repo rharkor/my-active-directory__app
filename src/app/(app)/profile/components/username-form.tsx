@@ -26,6 +26,7 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
 import { DialogClose } from '@radix-ui/react-dialog';
 import api from '@/lib/api';
+import { UnknowError } from '@/lib/constants';
 
 export const usernameFormSchema = z.object({
   id: z.string(),
@@ -109,7 +110,7 @@ export default function UsernameForm({
       } else {
         toast({
           title: 'Error',
-          description: 'An unknown error occurred.',
+          description: UnknowError,
         });
       }
     } finally {

@@ -21,6 +21,7 @@ import { useRouter } from 'next/navigation';
 import { apiLogin } from '@/lib/auth-calls';
 import api from '@/lib/api';
 import { logger } from '@/lib/logger';
+import { UnknowError } from '@/lib/constants';
 
 export const loginFormSchema = z.object({
   username: z
@@ -67,7 +68,7 @@ export default function LoginForm() {
       } else {
         toast({
           title: 'Error',
-          description: 'An unknown error occurred.',
+          description: UnknowError,
         });
       }
     } finally {

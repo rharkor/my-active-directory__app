@@ -28,6 +28,7 @@ import { DialogClose } from '@radix-ui/react-dialog';
 import api from '@/lib/api';
 import { passWordRegexError, passwordRegex } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import { UnknowError } from '@/lib/constants';
 
 export const passwordFormSchema = z
   .object({
@@ -130,7 +131,7 @@ export default function PasswordForm({
       } else {
         toast({
           title: 'Error',
-          description: 'An unknown error occurred.',
+          description: UnknowError,
         });
       }
     } finally {

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { useUsersStore } from '@/contexts/users.store';
 import { apiUpdateUser } from '@/lib/auth-calls';
+import { UnknowError } from '@/lib/constants';
 import { logger } from '@/lib/logger';
 import { Editor } from '@monaco-editor/react';
 import { ReloadIcon } from '@radix-ui/react-icons';
@@ -66,7 +67,7 @@ export default function UserMetadata({
       } else {
         toast({
           title: 'Error',
-          description: 'An unknown error occurred.',
+          description: UnknowError,
         });
       }
     } finally {

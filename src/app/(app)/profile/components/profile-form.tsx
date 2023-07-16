@@ -16,6 +16,7 @@ import { useUserStore } from '@/contexts/user.store';
 import { logger } from '@/lib/logger';
 import { apiUpdateProfile } from '@/lib/auth-calls';
 import { ApiSchemas, UserSchema } from '@/types/api';
+import { UnknowError } from '@/lib/constants';
 
 export const profileNameFormSchema = z.object({
   id: z.string(),
@@ -120,7 +121,7 @@ export default function ProfileForm({
       } else {
         toast({
           title: 'Error',
-          description: 'An unknown error occurred.',
+          description: UnknowError,
         });
       }
     } finally {

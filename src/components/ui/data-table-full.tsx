@@ -39,6 +39,7 @@ import { DataTablePagination } from './data-table-pagination';
 import { Form } from './form';
 import FormField, { FormFieldProps } from './form-field';
 import { DialogClose } from '@radix-ui/react-dialog';
+import { UnknowError } from '@/lib/constants';
 
 export type ColumnDefExtended<
   TData extends z.AnyZodObject,
@@ -240,7 +241,7 @@ export default function DataTableFull<
       } else {
         toast({
           title: 'Error',
-          description: 'An unknown error occurred.',
+          description: UnknowError,
         });
       }
     } finally {
@@ -272,7 +273,7 @@ export default function DataTableFull<
       } else {
         toast({
           title: 'Error',
-          description: 'An unknown error occurred.',
+          description: UnknowError,
         });
       }
     } finally {
@@ -300,7 +301,7 @@ export default function DataTableFull<
       } else {
         toast({
           title: 'Error',
-          description: 'An unknown error occurred.',
+          description: UnknowError,
         });
       }
     } finally {

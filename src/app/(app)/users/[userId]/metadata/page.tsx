@@ -108,8 +108,11 @@ export default function UserMetadata({
             <ReloadIcon className="w-6 h-6 animate-spin text-muted-foreground" />
           }
         />
-        <Button className="absolute bottom-8 right-4" onClick={onSubmit}>
-          {isSubmitting && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
+        <Button
+          className="absolute bottom-8 right-4"
+          onClick={onSubmit}
+          isLoading={isSubmitting}
+        >
           Save Changes
         </Button>
       </div>

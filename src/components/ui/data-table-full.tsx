@@ -455,7 +455,11 @@ export default function DataTableFull<
                 {createRowButtonText}
               </Button>
             </DialogTrigger>
-            <Button className="ml-2" onClick={() => fetchRows()}>
+            <Button
+              className="ml-2"
+              onClick={() => fetchRows()}
+              disabled={rowsFething}
+            >
               <ReloadIcon
                 className={cn(
                   'w-4 h-4',
@@ -496,10 +500,7 @@ export default function DataTableFull<
                 <DialogClose asChild>
                   <Button variant="secondary">Cancel</Button>
                 </DialogClose>
-                <Button type="submit">
-                  {isRowModalSubmitting && (
-                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                  )}
+                <Button type="submit" isLoading={isRowModalSubmitting}>
                   Save
                 </Button>
               </DialogFooter>
@@ -536,10 +537,7 @@ export default function DataTableFull<
                 <DialogClose asChild>
                   <Button variant="secondary">Cancel</Button>
                 </DialogClose>
-                <Button type="submit">
-                  {isRowModalSubmitting && (
-                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                  )}
+                <Button type="submit" isLoading={isRowModalSubmitting}>
                   Save
                 </Button>
               </DialogFooter>

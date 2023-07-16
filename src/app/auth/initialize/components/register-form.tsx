@@ -14,7 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ReloadIcon } from '@radix-ui/react-icons';
 import { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
@@ -144,10 +143,7 @@ export default function LoginForm() {
             />
           </CardContent>
           <CardFooter className="w-full flex justify-end">
-            <Button type="submit">
-              {isSubmitting && (
-                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-              )}
+            <Button type="submit" isLoading={isSubmitting}>
               Register
             </Button>
           </CardFooter>

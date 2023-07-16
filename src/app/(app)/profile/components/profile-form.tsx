@@ -11,7 +11,6 @@ import { useRouter } from 'next/navigation';
 import { Form } from '@/components/ui/form';
 import FormField from '@/components/ui/form-field';
 import { Button } from '@/components/ui/button';
-import { ReloadIcon } from '@radix-ui/react-icons';
 import { useUserStore } from '@/contexts/user.store';
 import { logger } from '@/lib/logger';
 import { apiUpdateProfile } from '@/lib/auth-calls';
@@ -163,10 +162,11 @@ export default function ProfileForm({
                 description="Your last name."
                 autoComplete="family-name"
               />
-              <Button type="submit" className="mt-4 w-max ml-auto">
-                {isSubmitting && (
-                  <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                )}
+              <Button
+                type="submit"
+                className="mt-4 w-max ml-auto"
+                isLoading={isSubmitting}
+              >
                 Save Changes
               </Button>
             </div>

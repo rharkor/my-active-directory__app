@@ -19,7 +19,6 @@ import { useEffect, useState } from 'react';
 import { logger } from '@/lib/logger';
 import { Form } from '@/components/ui/form';
 import FormField from '@/components/ui/form-field';
-import { ReloadIcon } from '@radix-ui/react-icons';
 import { ApiSchemas, UserSchema } from '@/types/api';
 import { apiUpdateProfile } from '@/lib/auth-calls';
 import { useRouter } from 'next/navigation';
@@ -157,10 +156,7 @@ export default function UsernameForm({
                 <DialogClose asChild>
                   <Button variant="secondary">Cancel</Button>
                 </DialogClose>
-                <Button type="submit">
-                  {isSubmitting && (
-                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                  )}
+                <Button type="submit" isLoading={isSubmitting}>
                   Save
                 </Button>
               </DialogFooter>

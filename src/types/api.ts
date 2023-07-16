@@ -69,16 +69,17 @@ export const RolesSchema = z.array(RoleSchema);
 
 export const UserSchema = z.object({
   id: z.number(),
-  email: z.string().email(),
-  username: z.string().min(5).max(50),
-  firstName: z.string().min(2).max(50),
-  lastName: z.string().min(2).max(50),
+  email: z.string().email().optional(),
+  username: z.string().min(5).max(50).optional(),
+  firstName: z.string().min(2).max(50).optional(),
+  lastName: z.string().min(2).max(50).optional(),
   metadata: z
     .object({
-      avatar: z.string().nullable(), //? URL to the avatar
+      avatar: z.string().nullable().optional(), //? URL to the avatar
     })
-    .nullable(),
-  roles: RolesSchema,
+    .nullable()
+    .optional(),
+  roles: RolesSchema.optional(),
   activeRoles: z.number(),
 });
 
@@ -271,6 +272,13 @@ export const ApiSchemas = {
         .string()
         .min(5)
         .max(50)
+        .optional()
+        .transform((v) => (v === '' ? undefined : v)),
+      password: z
+        .string()
+        .min(8)
+        .max(50)
+        .regex(passwordRegex, passWordRegexError)
         .optional()
         .transform((v) => (v === '' ? undefined : v)),
       firstName: z

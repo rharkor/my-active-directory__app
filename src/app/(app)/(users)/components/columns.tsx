@@ -52,6 +52,17 @@ export const getColumns: () => ColumnDefExtended<
     },
   },
   {
+    accessorKey: 'password',
+    forceHidden: true,
+    name: 'password',
+    type: 'password',
+    label: 'Password',
+    autoComplete: 'new-password',
+    create: {
+      defaultValue: '',
+    },
+  },
+  {
     accessorKey: 'firstName',
     header: sortableHeader('First Name'),
     type: 'text',
@@ -104,17 +115,17 @@ export const getColumns: () => ColumnDefExtended<
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user.email)}
+              onClick={() => navigator.clipboard.writeText(user.email ?? '')}
             >
               Copy email
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user.username)}
+              onClick={() => navigator.clipboard.writeText(user.username ?? '')}
             >
               Copy username
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link href={`/users/${user.id}`}>View user</Link>
             </DropdownMenuItem>
           </DropdownMenuContent>

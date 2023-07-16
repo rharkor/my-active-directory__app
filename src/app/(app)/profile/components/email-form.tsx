@@ -20,7 +20,7 @@ import { logger } from '@/lib/logger';
 import { Form } from '@/components/ui/form';
 import FormField from '@/components/ui/form-field';
 import { ReloadIcon } from '@radix-ui/react-icons';
-import { ApiSchemas } from '@/types/api';
+import { ApiSchemas, UserSchema } from '@/types/api';
 import { apiUpdateProfile } from '@/lib/auth-calls';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
@@ -32,12 +32,30 @@ export const emailFormSchema = z.object({
   email: z.string().email(),
 });
 
-export default function EmailForm() {
-  const profile = useUserStore((state) => state.profile);
+export default function EmailForm({
+  user,
+  skeleton,
+  successMessage,
+  errorMessage,
+}: {
+  user?: z.infer<typeof UserSchema>;
+  skeleton?: boolean;
+  successMessage?: string;
+  errorMessage?: string;
+}) {
+  const userStoreProfile = useUserStore((state) => state.profile);
+  const loadProfile = useUserStore((state) => state.loadProfile);
+  const profile = user ?? userStoreProfile;
+
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  //? Define the skeleton values
+  const skeletonValues = {
+    email: 'Loading...',
+  };
 
   //? Define the form state
   const form = useForm<z.infer<typeof emailFormSchema>>({
@@ -45,6 +63,7 @@ export default function EmailForm() {
     defaultValues: {
       id: profile?.id.toString() ?? '',
       email: profile?.email ?? '',
+      ...(skeleton ? skeletonValues : {}),
     },
   });
 
@@ -68,15 +87,15 @@ export default function EmailForm() {
       api.setTokens(res.tokens);
       toast({
         title: 'Success',
-        description: 'Email updated successfully.',
+        description: successMessage ?? 'Email updated successfully.',
         duration: 5000,
       });
       //? Refresh the profile (do not await this)
-      useUserStore.getState().loadProfile(router);
+      loadProfile(router);
       //? Close the dialog
       setIsDialogOpen(false);
     } catch (error) {
-      logger.error('Error updating email', error);
+      logger.error(errorMessage ?? 'Error updating email', error);
       if (typeof error === 'string') {
         toast({
           title: 'Error',

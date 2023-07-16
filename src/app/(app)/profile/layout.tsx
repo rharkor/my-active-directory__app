@@ -21,7 +21,7 @@ export default function ProfileLayout({
   return (
     <main className="space-y-6 container mt-8">
       <div className="space-y-0.5">
-        <TypographyH1>Profile</TypographyH1>
+        <TypographyH1>Your Profile</TypographyH1>
         <p className="text-muted-foreground">
           Manage your account settings and appearance preferences.
         </p>

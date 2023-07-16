@@ -10,10 +10,14 @@ import { ChangeEventHandler, useEffect, useRef, useState } from 'react';
 import { useToast } from './ui/use-toast';
 import { logger } from '@/lib/logger';
 import urlJoin from 'url-join';
+import { UserSchema } from '@/types/api';
+import * as z from 'zod';
 
 export type ProfileAvatarProps = {
   xl?: boolean;
   className?: string;
+  user?: z.infer<typeof UserSchema> | null;
+  description?: string;
 } & (
   | {
       editable?: false;
@@ -29,10 +33,14 @@ export default function ProfileAvatar({
   className,
   xl = false,
   editable = false,
+  user,
+  description,
   onChange,
 }: ProfileAvatarProps) {
+  const userStoreProfile = useUserStore((state) => state.profile);
+  const profile = user ?? userStoreProfile;
+
   const { toast } = useToast();
-  const profile = useUserStore((state) => state.profile);
   const router = useRouter();
 
   const inputAvatarRef = useRef<HTMLInputElement>(null);
@@ -87,7 +95,7 @@ export default function ProfileAvatar({
     };
 
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 justify-center items-center">
         <div className={cn('relative group flex flex-col gap-4', className)}>
           <Avatar className={cnExtended}>
             <AvatarImage
@@ -128,7 +136,7 @@ export default function ProfileAvatar({
           )}
         </div>
         <p className="text-center text-base text-muted-foreground mt-2">
-          Your profile picture
+          {description ?? 'Your profile picture'}
         </p>
       </div>
     );

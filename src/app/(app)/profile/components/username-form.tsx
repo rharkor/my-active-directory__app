@@ -20,7 +20,7 @@ import { logger } from '@/lib/logger';
 import { Form } from '@/components/ui/form';
 import FormField from '@/components/ui/form-field';
 import { ReloadIcon } from '@radix-ui/react-icons';
-import { ApiSchemas } from '@/types/api';
+import { ApiSchemas, UserSchema } from '@/types/api';
 import { apiUpdateProfile } from '@/lib/auth-calls';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
@@ -37,12 +37,30 @@ export const usernameFormSchema = z.object({
     }),
 });
 
-export default function UsernameForm() {
-  const profile = useUserStore((state) => state.profile);
+export default function UsernameForm({
+  user,
+  skeleton,
+  successMessage,
+  errorMessage,
+}: {
+  user?: z.infer<typeof UserSchema>;
+  skeleton?: boolean;
+  successMessage?: string;
+  errorMessage?: string;
+}) {
+  const userStoreProfile = useUserStore((state) => state.profile);
+  const loadProfile = useUserStore((state) => state.loadProfile);
+  const profile = user ?? userStoreProfile;
+
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  //? Define the skeleton values
+  const skeletonValues = {
+    username: 'Loading...',
+  };
 
   //? Define the form state
   const form = useForm<z.infer<typeof usernameFormSchema>>({
@@ -50,6 +68,7 @@ export default function UsernameForm() {
     defaultValues: {
       id: profile?.id.toString() ?? '',
       username: profile?.username ?? '',
+      ...(skeleton ? skeletonValues : {}),
     },
   });
 
@@ -73,15 +92,15 @@ export default function UsernameForm() {
       api.setTokens(res.tokens);
       toast({
         title: 'Success',
-        description: 'Username updated successfully.',
+        description: successMessage ?? 'Username updated successfully.',
         duration: 5000,
       });
       //? Refresh the profile (do not await this)
-      useUserStore.getState().loadProfile(router);
+      loadProfile(router);
       //? Close the dialog
       setIsDialogOpen(false);
     } catch (error) {
-      logger.error('Error updating username', error);
+      logger.error(errorMessage ?? 'Error updating username', error);
       if (typeof error === 'string') {
         toast({
           title: 'Error',

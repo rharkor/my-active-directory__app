@@ -1,6 +1,8 @@
+import { UserSchema } from '@/types/api';
 import { ColumnFiltersState, SortingState } from '@tanstack/react-table';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import * as z from 'zod';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -108,4 +110,17 @@ export const sortingToQuery = (sorting: SortingState) => {
     }
   }
   return query;
+};
+
+export const getUserDisplayName = (user: z.infer<typeof UserSchema>) => {
+  if (user.firstName && user.lastName) {
+    return `${user.firstName} ${user.lastName}`;
+  }
+  if (user.firstName) {
+    return user.firstName;
+  }
+  if (user.lastName) {
+    return user.lastName;
+  }
+  return user.email ?? user.username;
 };

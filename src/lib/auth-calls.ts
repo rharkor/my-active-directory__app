@@ -288,9 +288,15 @@ export const apiGetAllUsers = async (
  */
 export const apiGetUser = async (id: string, router: AppRouterInstance) => {
   //? send the request
-  return api.fetch(`/users/${id}`, undefined, router) as Promise<
-    z.infer<typeof ApiSchemas.getOneUser.response>
-  >;
+  return api.fetch(
+    `/users/${id}`,
+    {
+      next: {
+        revalidate: 0, //? Do not cache the data
+      },
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.getOneUser.response>>;
 };
 
 /**

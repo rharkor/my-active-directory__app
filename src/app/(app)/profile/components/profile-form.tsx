@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import ProfileAvatar from '../../../../components/profile-avatar';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
@@ -15,7 +15,7 @@ import { ReloadIcon } from '@radix-ui/react-icons';
 import { useUserStore } from '@/contexts/user.store';
 import { logger } from '@/lib/logger';
 import { apiUpdateProfile } from '@/lib/auth-calls';
-import { ApiSchemas } from '@/types/api';
+import { ApiSchemas, UserSchema } from '@/types/api';
 
 export const profileNameFormSchema = z.object({
   id: z.string(),
@@ -34,11 +34,33 @@ export const profileNameFormSchema = z.object({
     .transform((value) => (value === '' ? undefined : value)),
 });
 
-export default function ProfileForm() {
+export default function ProfileForm({
+  user,
+  skeleton,
+  refreshCallback,
+  successMessage,
+  errorMessage,
+}: {
+  user?: z.infer<typeof UserSchema>;
+  skeleton?: boolean;
+  refreshCallback?: () => void;
+  successMessage?: string;
+  errorMessage?: string;
+}) {
+  const userStoreProfile = useUserStore((state) => state.profile);
+  const loadProfile = useUserStore((state) => state.loadProfile);
+  const profile = user ?? userStoreProfile;
+
   const { toast } = useToast();
-  const profile = useUserStore((state) => state.profile);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+
+  //? Define the skeleton values
+  const skeletonValues = {
+    firstName: 'Loading...',
+    lastName: 'Loading...',
+    profilePicture: '',
+  };
 
   //? Define the form state
   const form = useForm<z.infer<typeof profileNameFormSchema>>({
@@ -48,6 +70,7 @@ export default function ProfileForm() {
       firstName: profile?.firstName ?? '',
       lastName: profile?.lastName ?? '',
       profilePicture: profile?.metadata?.avatar ?? '',
+      ...(skeleton ? skeletonValues : {}),
     },
   });
 
@@ -76,13 +99,19 @@ export default function ProfileForm() {
       await apiUpdateProfile(values.id, newValues, router);
       toast({
         title: 'Success',
-        description: 'Profile updated successfully.',
+        description: successMessage ?? 'Profile updated successfully.',
         duration: 5000,
       });
-      //? Refresh the profile (do not await this)
-      useUserStore.getState().loadProfile(router);
+
+      if (refreshCallback) {
+        //? Execute the callback (do not await this)
+        refreshCallback();
+      } else {
+        //? Refresh the profile (do not await this)
+        loadProfile(router);
+      }
     } catch (error) {
-      logger.error('Error updating profile', error);
+      logger.error(errorMessage ?? 'Error updating profile', error);
       if (typeof error === 'string') {
         toast({
           title: 'Error',
@@ -112,6 +141,8 @@ export default function ProfileForm() {
                 xl
                 editable
                 onChange={(value) => form.setValue('profilePicture', value)}
+                user={profile}
+                description="Profile picture."
               />
             </div>
             <div className="flex flex-col flex-[1.2]">
@@ -131,16 +162,14 @@ export default function ProfileForm() {
                 description="Your last name."
                 autoComplete="family-name"
               />
+              <Button type="submit" className="mt-4 w-max ml-auto">
+                {isSubmitting && (
+                  <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Save Changes
+              </Button>
             </div>
           </CardContent>
-          <CardFooter className="w-full flex justify-end">
-            <Button type="submit">
-              {isSubmitting && (
-                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Save Changes
-            </Button>
-          </CardFooter>
         </Card>
       </form>
     </Form>

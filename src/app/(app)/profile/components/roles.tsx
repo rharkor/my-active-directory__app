@@ -23,7 +23,7 @@ function RoleToken({
       key={role.name}
       variant="outline"
       style={badgeStyle(role.color ?? 'var(--foreground)')}
-      className="mr-2 mb-2"
+      className="mb-2"
     >
       {role.name}
     </Badge>

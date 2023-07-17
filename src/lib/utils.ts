@@ -132,7 +132,15 @@ export const getUserDisplayName = (
 };
 
 const emptyStringToUndefined = z.literal('').transform(() => undefined);
+const emptyStringToNull = z.literal('').transform(() => null);
 
-export function asOptionalField<T extends z.ZodTypeAny>(schema: T) {
-  return schema.optional().or(emptyStringToUndefined);
+export function asOptionalField<T extends z.ZodTypeAny>(
+  schema: T,
+  toNull?: boolean,
+) {
+  if (toNull) {
+    return schema.nullable().or(emptyStringToNull);
+  } else {
+    return schema.optional().or(emptyStringToUndefined);
+  }
 }

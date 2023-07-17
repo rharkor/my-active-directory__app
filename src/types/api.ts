@@ -139,16 +139,17 @@ export const ApiSchemas = {
   },
   updateProfile: {
     body: z.object({
-      email: z.string().email().optional(),
-      username: z.string().min(5).max(50).optional(),
-      firstName: z.string().min(2).max(50).optional(),
-      lastName: z.string().min(2).max(50).optional(),
-      metadata: z
-        .object({
-          avatar: z.string().nullable().optional(), //? URL to the avatar
-        })
-        .nullable()
-        .optional(),
+      email: asOptionalField(z.string().email()),
+      username: asOptionalField(z.string().min(5).max(50)),
+      firstName: asOptionalField(z.string().min(2).max(50), true),
+      lastName: asOptionalField(z.string().min(2).max(50), true),
+      metadata: asOptionalField(
+        z
+          .object({
+            avatar: z.string().nullable().optional(), //? URL to the avatar
+          })
+          .optional(),
+      ),
     }),
     response: UserSchema.extend({
       tokens: TokensSchema,

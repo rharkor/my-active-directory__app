@@ -16,24 +16,14 @@ import { logger } from '@/lib/logger';
 import { apiUpdateProfile } from '@/lib/auth-calls';
 import { ApiSchemas, UserSchema } from '@/types/api';
 import { UnknowError } from '@/lib/constants';
+import { asOptionalField } from '@/lib/utils';
 
 export const profileNameFormSchema = z.object({
   id: z.string(),
-  firstName: z
-    .string()
-    .optional()
-    .transform((value) => (value === '' ? undefined : value)),
-  lastName: z
-    .string()
-    .optional()
-    .transform((value) => (value === '' ? undefined : value)),
-  profilePicture: z
-    .string()
-    .optional()
-    .nullable()
-    .transform((value) => (value === '' ? undefined : value)),
+  firstName: asOptionalField(z.string().min(2).max(50), true),
+  lastName: asOptionalField(z.string().min(2).max(50), true),
+  profilePicture: asOptionalField(z.string()),
 });
-
 export default function ProfileForm({
   user,
   skeleton,

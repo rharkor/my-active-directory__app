@@ -4,8 +4,11 @@ import DataTableFull from '@/components/ui/data-table-full';
 import { ApiSchemas } from '@/types/api';
 import { apiCreateUser, apiGetAllUsers } from '@/lib/auth-calls';
 import { getColumns } from './columns';
+import { useUserStore } from '@/contexts/user.store';
 
 export default function Table() {
+  const profile = useUserStore((state) => state.profile);
+
   return (
     <DataTableFull
       createSchema={ApiSchemas.createUser.body}
@@ -24,7 +27,7 @@ export default function Table() {
           row.email || row.username || row.firstName + ' ' + row.lastName
         }`
       }
-      getColumns={getColumns}
+      getColumns={getColumns(profile)}
       createRowButtonText="Create user"
       searchColumnName={'email'}
       searchPlaceholder="Search users by email"

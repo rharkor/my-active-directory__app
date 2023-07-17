@@ -17,12 +17,15 @@ import {
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
+import * as z from 'zod';
 
-export const getColumns: () => ColumnDefExtended<
+export const getColumns: (
+  curUser: z.infer<typeof ApiSchemas.profile.response> | null,
+) => () => ColumnDefExtended<
   typeof UserSchema,
   typeof ApiSchemas.createUser.body,
   typeof ApiSchemas.updateUser.body
->[] = () => [
+>[] = (curUser) => () => [
   {
     accessorKey: 'id',
     header: 'Id',
@@ -104,6 +107,7 @@ export const getColumns: () => ColumnDefExtended<
     id: 'actions',
     cell: ({ row }) => {
       const user = row.original as Zod.TypeOf<typeof UserSchema>;
+      const isRowOfCurrentUser = curUser?.id === user.id;
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -126,7 +130,11 @@ export const getColumns: () => ColumnDefExtended<
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href={`/users/${user.id}`}>View user</Link>
+              {isRowOfCurrentUser ? (
+                <Link href={`/profile`}>View user</Link>
+              ) : (
+                <Link href={`/users/${user.id}`}>View user</Link>
+              )}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

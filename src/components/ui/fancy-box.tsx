@@ -64,14 +64,15 @@ export const FancyBox = React.forwardRef<HTMLInputElement, FancyBoxProps>(
       );
     };
 
+    const valuesWatched = props.form.watch(props.inputProps.name ?? '');
+
     React.useEffect(() => {
-      const value = props.form.getValues(props.inputProps.name ?? '');
-      if (value.length > 0) {
+      if (valuesWatched.length > 0) {
         setSelectedValues(
-          props.items.filter((item) => value.includes(item.value)),
+          props.items.filter((item) => valuesWatched.includes(item.value)),
         );
       }
-    }, [props.form, props.items, props.inputProps.name]);
+    }, [valuesWatched, props.items, props.inputProps.name]);
 
     const onComboboxOpenChange = (value: boolean) => {
       inputRef.current?.blur();

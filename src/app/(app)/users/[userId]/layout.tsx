@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { useUsersStore } from '@/contexts/users.store';
 import { UserSchema } from '@/types/api';
 import * as z from 'zod';
+import { useUserStore } from '@/contexts/user.store';
 
 const sidebarNavItems = (userId: string) => [
   {
@@ -30,6 +31,7 @@ export default function ProfileLayout({
   params: { userId: string };
 }) {
   const router = useRouter();
+  const profile = useUserStore((state) => state.profile);
   const loadUser = useUsersStore((state) => state.loadUser);
   const user: z.infer<typeof UserSchema> | undefined = useUsersStore(
     (state) => state.users[params.userId],
@@ -42,6 +44,12 @@ export default function ProfileLayout({
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
+
+  useEffect(() => {
+    if (user && profile && user.id === profile.id) {
+      router.replace('/profile');
+    }
+  }, [profile, router, user]);
 
   return (
     <main className="space-y-6 container mt-8 flex-1 flex flex-col">

@@ -2,12 +2,7 @@
 
 import DataTableFull from '@/components/ui/data-table-full';
 import { ApiSchemas } from '@/types/api';
-import {
-  apiCreateUser,
-  apiDeleteUser,
-  apiGetAllUsers,
-  apiUpdateUser,
-} from '@/lib/auth-calls';
+import { apiCreateUser, apiGetAllUsers } from '@/lib/auth-calls';
 import { getColumns } from './columns';
 
 export default function Table() {
@@ -16,8 +11,6 @@ export default function Table() {
       createSchema={ApiSchemas.createUser.body}
       updateSchema={ApiSchemas.updateUser.body}
       apiCreateRow={apiCreateUser}
-      apiUpdateRow={apiUpdateUser}
-      apiDeleteRow={apiDeleteUser}
       apiGetAllRows={apiGetAllUsers}
       createRowErrorMessage="Failed to create user"
       createRowSuccessMessage="User created successfully"

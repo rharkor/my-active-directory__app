@@ -1,4 +1,5 @@
 import {
+  asOptionalField,
   passWordRegexError,
   passwordRegex,
   slugRegex,
@@ -263,36 +264,13 @@ export const ApiSchemas = {
   },
   createUser: {
     body: z.object({
-      email: z
-        .string()
-        .email()
-        .optional()
-        .transform((v) => (v === '' ? undefined : v)),
-      username: z
-        .string()
-        .min(5)
-        .max(50)
-        .optional()
-        .transform((v) => (v === '' ? undefined : v)),
-      password: z
-        .string()
-        .min(8)
-        .max(50)
-        .regex(passwordRegex, passWordRegexError)
-        .optional()
-        .transform((v) => (v === '' ? undefined : v)),
-      firstName: z
-        .string()
-        .min(2)
-        .max(50)
-        .optional()
-        .transform((v) => (v === '' ? undefined : v)),
-      lastName: z
-        .string()
-        .min(2)
-        .max(50)
-        .optional()
-        .transform((v) => (v === '' ? undefined : v)),
+      email: asOptionalField(z.string().email()),
+      username: asOptionalField(z.string().min(5).max(50)),
+      password: asOptionalField(
+        z.string().min(8).max(50).regex(passwordRegex, passWordRegexError),
+      ),
+      firstName: asOptionalField(z.string().min(2).max(50)),
+      lastName: asOptionalField(z.string().min(2).max(50)),
       metadata: z.any().optional(),
       roles: z.array(z.string()).optional(),
     }),
@@ -300,35 +278,24 @@ export const ApiSchemas = {
   },
   updateUser: {
     body: z.object({
-      email: z
-        .string()
-        .email()
-        .optional()
-        .transform((v) => (v === '' ? undefined : v)),
-      username: z
-        .string()
-        .min(5)
-        .max(50)
-        .optional()
-        .transform((v) => (v === '' ? undefined : v)),
-      firstName: z
-        .string()
-        .min(2)
-        .max(50)
-        .optional()
-        .transform((v) => (v === '' ? undefined : v)),
-      lastName: z
-        .string()
-        .min(2)
-        .max(50)
-        .optional()
-        .transform((v) => (v === '' ? undefined : v)),
+      email: asOptionalField(z.string().email()),
+      username: asOptionalField(z.string().min(5).max(50)),
+      firstName: asOptionalField(z.string().min(2).max(50)),
+      lastName: asOptionalField(z.string().min(2).max(50)),
       metadata: z.any().optional(),
       roles: z.array(z.string()).optional(),
     }),
     response: UserSchema,
   },
   deleteUser: {
+    body: z.object({
+      force: z.boolean(),
+      email: asOptionalField(z.string().email()),
+      username: asOptionalField(z.string().min(5).max(50)),
+      password: asOptionalField(
+        z.string().min(8).max(50).regex(passwordRegex, passWordRegexError),
+      ),
+    }),
     response: z.object({
       deleted: z.boolean(),
     }),

@@ -45,6 +45,19 @@ export interface ButtonProps
   disabledWhileLoading?: boolean;
 }
 
+const Loading = ({
+  isLoading,
+  reloadIcon,
+}: {
+  isLoading?: boolean;
+  reloadIcon?: React.ReactNode;
+}) => {
+  return (
+    isLoading &&
+    (reloadIcon ?? <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />)
+  );
+};
+
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
@@ -60,6 +73,29 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     const Comp = asChild ? Slot : 'button';
+
+    if (asChild) {
+      const newChildren = React.cloneElement(
+        props.children as React.ReactElement,
+        {
+          children: (
+            <>
+              <Loading isLoading={isLoading} reloadIcon={reloadIcon} />
+              {props.children}
+            </>
+          ),
+        },
+      );
+      props.children = newChildren;
+    } else {
+      props.children = (
+        <>
+          <Loading isLoading={isLoading} reloadIcon={reloadIcon} />
+          {props.children}
+        </>
+      );
+    }
+
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
@@ -67,8 +103,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
         disabled={disabledWhileLoading && isLoading ? true : props.disabled}
       >
-        {isLoading &&
-          (reloadIcon ?? <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />)}
         {props.children}
       </Comp>
     );

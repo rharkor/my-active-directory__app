@@ -356,12 +356,17 @@ export const apiUpdateUser = async (
 /**
  * Delete a user
  */
-export const apiDeleteUser = async (id: string, router: AppRouterInstance) => {
+export const apiDeleteUser = async (
+  id: string,
+  body: z.infer<typeof ApiSchemas.deleteUser.body>,
+  router: AppRouterInstance,
+) => {
   //? send the request
   return api.fetch(
     `/users/${id}`,
     {
       method: 'DELETE',
+      body: JSON.stringify(body),
     },
     router,
   ) as Promise<z.infer<typeof ApiSchemas.deleteUser.response>>;

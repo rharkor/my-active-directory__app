@@ -112,15 +112,27 @@ export const sortingToQuery = (sorting: SortingState) => {
   return query;
 };
 
-export const getUserDisplayName = (user: z.infer<typeof UserSchema>) => {
-  if (user.firstName && user.lastName) {
+export const getUserDisplayName = (
+  user: z.infer<typeof UserSchema> | undefined | null,
+  onlyEmailAndUsername?: boolean,
+) => {
+  if (!user) {
+    return undefined;
+  }
+  if (user.firstName && user.lastName && !onlyEmailAndUsername) {
     return `${user.firstName} ${user.lastName}`;
   }
-  if (user.firstName) {
+  if (user.firstName && !onlyEmailAndUsername) {
     return user.firstName;
   }
-  if (user.lastName) {
+  if (user.lastName && !onlyEmailAndUsername) {
     return user.lastName;
   }
   return user.email ?? user.username;
 };
+
+const emptyStringToUndefined = z.literal('').transform(() => undefined);
+
+export function asOptionalField<T extends z.ZodTypeAny>(schema: T) {
+  return schema.optional().or(emptyStringToUndefined);
+}

@@ -1,13 +1,17 @@
 'use client';
 
+import DeleteForm from '@/app/(app)/profile/components/delete-form';
 import EmailForm from '@/app/(app)/profile/components/email-form';
 import PasswordForm from '@/app/(app)/profile/components/password-form';
 import ProfileForm from '@/app/(app)/profile/components/profile-form';
 import UsernameForm from '@/app/(app)/profile/components/username-form';
 import { Separator } from '@/components/ui/separator';
 import { useUsersStore } from '@/contexts/users.store';
+import { getUserDisplayName } from '@/lib/utils';
+import { UserSchema } from '@/types/api';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
+import * as z from 'zod';
 
 export default function UserPage({
   params: { userId },
@@ -15,12 +19,16 @@ export default function UserPage({
   params: { userId: string };
 }) {
   const router = useRouter();
-  const user = useUsersStore((state) => state.users[userId]);
+  const user: z.infer<typeof UserSchema> | undefined = useUsersStore(
+    (state) => state.users[userId],
+  );
   const loadUser = useUsersStore((state) => state.loadUser);
 
   const refreshCallback = useCallback(async () => {
     await loadUser(userId, router);
   }, [loadUser, router, userId]);
+
+  const userDisplayName = getUserDisplayName(user, true);
 
   return (
     <section className="space-y-6 mb-8">
@@ -61,6 +69,26 @@ export default function UserPage({
           errorMessage="Error updating user."
         />
       </section>
+      <Separator />
+      <DeleteForm
+        buttonMessage="Delete the account"
+        confirmMessage={
+          <>
+            This action cannot be undone. This will permanently delete
+            {userDisplayName ? (
+              <code className="text-white mx-1">{userDisplayName}</code>
+            ) : (
+              'this account'
+            )}{' '}
+            and remove his data from our servers.
+          </>
+        }
+        forceDelete={true}
+        user={user}
+        skeleton={false}
+        successMessage="User deleted successfully."
+        errorMessage="Error deleting user."
+      />
     </section>
   );
 }

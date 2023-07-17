@@ -125,12 +125,12 @@ export interface DataTableFullProps<
     values: z.TypeOf<z.Schema>,
     router: AppRouterInstance,
   ) => Promise<unknown>;
-  apiUpdateRow: (
+  apiUpdateRow?: (
     id: string,
     values: z.TypeOf<z.Schema>,
     router: AppRouterInstance,
   ) => Promise<unknown>;
-  apiDeleteRow: (id: string, router: AppRouterInstance) => Promise<unknown>;
+  apiDeleteRow?: (id: string, router: AppRouterInstance) => Promise<unknown>;
   apiGetAllRows: (
     router: AppRouterInstance,
     page?: string,
@@ -252,6 +252,7 @@ export default function DataTableFull<
   //? Edit a row
   const editRow = async (id: number, values: z.TypeOf<TUpdateSchema>) => {
     try {
+      if (!apiUpdateRow) throw new Error('apiUpdateRow is not defined');
       setIsRowModalSubmitting(true);
       await apiUpdateRow(id.toString(), values, router);
       toast({
@@ -284,6 +285,7 @@ export default function DataTableFull<
   //? Delete a row
   const deleteRow = (id: number) => async () => {
     try {
+      if (!apiDeleteRow) throw new Error('apiDeleteRow is not defined');
       await apiDeleteRow(id.toString(), router);
       toast({
         title: 'Success',

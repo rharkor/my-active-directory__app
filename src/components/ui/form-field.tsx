@@ -11,6 +11,7 @@ import * as z from 'zod';
 import { Input } from '@/components/ui/input';
 import { PasswordEyeSlash } from '@/components/ui/password-eye-slash';
 import { RoleBox } from './role-box';
+import { cn } from '@/lib/utils';
 
 export type FormFieldProps<T extends z.ZodTypeAny> = {
   form: UseFormReturn<z.infer<T>>;
@@ -20,6 +21,7 @@ export type FormFieldProps<T extends z.ZodTypeAny> = {
   description?: string;
   type?: string;
   autoComplete?: string;
+  className?: string;
 };
 
 function getInner<T extends z.ZodTypeAny>({
@@ -59,13 +61,14 @@ export default function FormField<T extends z.ZodTypeAny>({
   description,
   type,
   autoComplete,
+  className,
 }: FormFieldProps<T>) {
   return (
     <FormFieldComponent
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className={cn(className)}>
           <FormLabel>{label}</FormLabel>
           <FormControl>
             {getInner({

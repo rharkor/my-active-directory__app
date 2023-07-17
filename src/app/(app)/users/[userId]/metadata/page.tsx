@@ -6,10 +6,12 @@ import { useUsersStore } from '@/contexts/users.store';
 import { apiUpdateUser } from '@/lib/auth-calls';
 import { UnknowError } from '@/lib/constants';
 import { logger } from '@/lib/logger';
+import { UserSchema } from '@/types/api';
 import { Editor } from '@monaco-editor/react';
 import { ReloadIcon } from '@radix-ui/react-icons';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import * as z from 'zod';
 
 export default function UserMetadata({
   params: { userId },
@@ -18,7 +20,9 @@ export default function UserMetadata({
 }) {
   const router = useRouter();
   const editorRef = useRef<HTMLDivElement>(null);
-  const user = useUsersStore((state) => state.users[userId]);
+  const user: z.infer<typeof UserSchema> | undefined = useUsersStore(
+    (state) => state.users[userId],
+  );
   const loadUser = useUsersStore((state) => state.loadUser);
 
   const [value, setValue] = useState<string | undefined>(

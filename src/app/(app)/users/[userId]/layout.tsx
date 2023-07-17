@@ -8,6 +8,8 @@ import { useCallback, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRouter } from 'next/navigation';
 import { useUsersStore } from '@/contexts/users.store';
+import { UserSchema } from '@/types/api';
+import * as z from 'zod';
 
 const sidebarNavItems = (userId: string) => [
   {
@@ -29,7 +31,9 @@ export default function ProfileLayout({
 }) {
   const router = useRouter();
   const loadUser = useUsersStore((state) => state.loadUser);
-  const user = useUsersStore((state) => state.users[params.userId]);
+  const user: z.infer<typeof UserSchema> | undefined = useUsersStore(
+    (state) => state.users[params.userId],
+  );
 
   const fetchUser = useCallback(() => {
     loadUser(params.userId, router);

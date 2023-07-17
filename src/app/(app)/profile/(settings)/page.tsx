@@ -4,6 +4,7 @@ import EmailForm from '../components/email-form';
 import UsernameForm from '../components/username-form';
 import PasswordForm from '../components/password-form';
 import TokensTable from '../components/tokens-table';
+import DeleteForm from '../components/delete-form';
 
 export default function Settings() {
   return (
@@ -26,6 +27,8 @@ export default function Settings() {
       </section>
       <Separator />
       <TokensTable />
+      <Separator />
+      <DeleteForm />
     </section>
   );
 }

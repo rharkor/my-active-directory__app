@@ -419,6 +419,19 @@ export default function DataTableFull<
         res = onRowsFetched(res);
       }
       setRows(res);
+    } catch (error) {
+      logger.error("Error while fetching rows", error);
+      if (typeof error === 'string') {
+        toast({
+          title: 'Error',
+          description: error,
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: UnknowError,
+        });
+      }
     } finally {
       setRowsFetching(false);
     }

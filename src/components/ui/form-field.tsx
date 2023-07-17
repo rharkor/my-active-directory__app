@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { PasswordEyeSlash } from '@/components/ui/password-eye-slash';
 import { RoleBox } from './role-box';
 import { cn } from '@/lib/utils';
+import { HTMLInputTypeAttribute } from 'react';
 
 export type FormFieldProps<T extends z.ZodTypeAny> = {
   form: UseFormReturn<z.infer<T>>;
@@ -19,7 +20,7 @@ export type FormFieldProps<T extends z.ZodTypeAny> = {
   label: string;
   placeholder?: string;
   description?: string;
-  type?: string;
+  type?: HTMLInputTypeAttribute | 'role-box' | 'password';
   autoComplete?: string;
   className?: string;
 };

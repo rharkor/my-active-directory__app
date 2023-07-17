@@ -24,7 +24,7 @@ import { Cross2Icon } from '@radix-ui/react-icons';
 import * as z from 'zod';
 import { UseFormReturn } from 'react-hook-form';
 
-const badgeStyle = (color: string) => ({
+export const badgeStyle = (color: string) => ({
   borderColor: `${color}20`,
   backgroundColor: `${color}30`,
   color,
@@ -63,6 +63,15 @@ export const FancyBox = React.forwardRef<HTMLInputElement, FancyBoxProps>(
         newItems.map((i) => i.value),
       );
     };
+
+    React.useEffect(() => {
+      const value = props.form.getValues(props.inputProps.name ?? '');
+      if (value.length > 0) {
+        setSelectedValues(
+          props.items.filter((item) => value.includes(item.value)),
+        );
+      }
+    }, [props.form, props.items, props.inputProps.name]);
 
     const onComboboxOpenChange = (value: boolean) => {
       inputRef.current?.blur();

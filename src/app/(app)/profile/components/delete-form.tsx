@@ -156,7 +156,7 @@ export default function DeleteForm({
               </AlertDialogHeader>
               {!forceDelete && (
                 <div className="space-y-4">
-                  {profile?.username && (
+                  {profile?.username ? (
                     <FormField
                       form={form}
                       name="username"
@@ -166,8 +166,7 @@ export default function DeleteForm({
                       autoComplete="username"
                       description="Enter your username."
                     />
-                  )}
-                  {profile?.email && (
+                  ) : (
                     <FormField
                       form={form}
                       name="email"

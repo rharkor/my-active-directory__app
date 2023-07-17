@@ -5,13 +5,29 @@ import EmailForm from '@/app/(app)/profile/components/email-form';
 import PasswordForm from '@/app/(app)/profile/components/password-form';
 import ProfileForm from '@/app/(app)/profile/components/profile-form';
 import UsernameForm from '@/app/(app)/profile/components/username-form';
+import { Button } from '@/components/ui/button';
+import { Form } from '@/components/ui/form';
+import FormField from '@/components/ui/form-field';
+import Pagination from '@/components/ui/pagination';
 import { Separator } from '@/components/ui/separator';
+import { toast } from '@/components/ui/use-toast';
 import { useUsersStore } from '@/contexts/users.store';
+import { apiGetUserRoles, apiUpdateUser } from '@/lib/auth-calls';
+import { UnknowError } from '@/lib/constants';
+import { logger } from '@/lib/logger';
 import { getUserDisplayName } from '@/lib/utils';
-import { UserSchema } from '@/types/api';
+import { ApiSchemas, UserSchema } from '@/types/api';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+
+const updateRolesSchema = z.object({
+  roles: z.array(z.string()),
+});
+
+const itemsPerPage = 20;
 
 export default function UserPage({
   params: { userId },
@@ -30,6 +46,90 @@ export default function UserPage({
 
   const userDisplayName = getUserDisplayName(user, true);
 
+  const [roles, setRoles] =
+    useState<z.infer<typeof ApiSchemas.getUserRoles.response>>();
+  const [isRolesLoading, setIsRolesLoading] = useState(false);
+
+  const form = useForm<z.infer<typeof updateRolesSchema>>({
+    resolver: zodResolver(updateRolesSchema),
+    defaultValues: {
+      roles: user?.roles?.map((role) => role.name) ?? [],
+    },
+  });
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const getRoles = useCallback(
+    async (updateLoadingState = true) => {
+      try {
+        if (updateLoadingState) setIsRolesLoading(true);
+        if (!user.id) throw new Error('User id not found');
+        const roles = await apiGetUserRoles(
+          user.id.toString(),
+          router,
+          currentPage.toString(),
+          itemsPerPage.toString(),
+        );
+        setRoles(roles);
+      } catch (error) {
+        logger.error('Error fetching roles', error);
+        if (typeof error === 'string') {
+          toast({
+            title: 'Error',
+            description: error,
+          });
+        } else {
+          toast({
+            title: 'Error',
+            description: UnknowError,
+          });
+        }
+      } finally {
+        if (updateLoadingState) setIsRolesLoading(false);
+      }
+    },
+    [currentPage, user.id, router],
+  );
+
+  const onSubmit = useCallback(
+    async (data: z.infer<typeof updateRolesSchema>) => {
+      try {
+        setIsRolesLoading(true);
+        if (!user) throw new Error('User not found');
+        await apiUpdateUser(user.id.toString(), { roles: data.roles }, router);
+        await getRoles(false);
+      } catch (error) {
+        logger.error('Error updating user roles', error);
+        if (typeof error === 'string') {
+          toast({
+            title: 'Error',
+            description: error,
+          });
+        } else {
+          toast({
+            title: 'Error',
+            description: UnknowError,
+          });
+        }
+      } finally {
+        setIsRolesLoading(false);
+      }
+    },
+    [getRoles, router, user],
+  );
+
+  //? Update roles when user changes
+  useEffect(() => {
+    if (!roles) return;
+    form.reset({
+      roles: roles.data.map((role) => role.name) ?? [],
+    });
+  }, [form, roles]);
+
+  useEffect(() => {
+    getRoles();
+  }, [getRoles]);
+
   return (
     <section className="space-y-6 mb-8">
       <header>
@@ -45,6 +145,39 @@ export default function UserPage({
         successMessage="User updated successfully."
         errorMessage="Error updating user."
       />
+      <section>
+        <header>
+          <h3 className="text-lg font-medium">Roles</h3>
+        </header>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col"
+          >
+            <FormField
+              label="Roles"
+              name="roles"
+              type="role-box"
+              placeholder="Select roles"
+              form={form}
+            />
+            {roles && roles.meta.totalPages > 1 && (
+              <Pagination
+                currentPage={roles.meta.currentPage}
+                totalPages={roles.meta.totalPages}
+                setCurrentPage={setCurrentPage}
+              />
+            )}
+            <Button
+              type="submit"
+              className="self-end"
+              isLoading={isRolesLoading}
+            >
+              Update roles
+            </Button>
+          </form>
+        </Form>
+      </section>
       <Separator />
       <section>
         <header>

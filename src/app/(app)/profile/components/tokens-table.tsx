@@ -188,10 +188,10 @@ export default function TokensTable() {
             (tokens.meta.totalPages > 1 ||
               itemsPerPageInitial !== itemsPerPage) && (
               <Pagination
-                currentPage={tokens?.meta.currentPage}
-                totalPages={tokens?.meta.totalPages}
+                currentPage={tokens.meta.currentPage}
+                totalPages={tokens.meta.totalPages}
                 setCurrentPage={setCurrentPage}
-                itemsPerPage={tokens?.meta.itemsPerPage}
+                itemsPerPage={tokens.meta.itemsPerPage}
                 setItemsPerPage={setItemsPerPage}
               />
             )}

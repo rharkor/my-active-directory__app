@@ -305,11 +305,17 @@ export const apiGetUser = async (id: string, router: AppRouterInstance) => {
 export const apiGetUserRoles = async (
   id: string,
   router: AppRouterInstance,
+  page?: string,
+  itemsPerPage?: string,
 ) => {
   //? send the request
-  return api.fetch(`/users/${id}/roles`, undefined, router) as Promise<
-    z.infer<typeof ApiSchemas.getUserRoles.response>
-  >;
+  return api.fetch(
+    `/users/${id}/roles${page ? `?page=${page}` : '?page=1'}${
+      itemsPerPage ? `&limit=${itemsPerPage}` : ''
+    }`,
+    undefined,
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.getUserRoles.response>>;
 };
 
 /**

@@ -5,6 +5,7 @@ import UsernameForm from '../components/username-form';
 import PasswordForm from '../components/password-form';
 import TokensTable from '../components/tokens-table';
 import DeleteForm from '../components/delete-form';
+import Roles from '../components/roles';
 
 export default function Settings() {
   return (
@@ -16,6 +17,12 @@ export default function Settings() {
         </p>
       </header>
       <ProfileForm />
+      <section>
+        <header>
+          <h3 className="text-lg font-medium">Roles</h3>
+        </header>
+        <Roles />
+      </section>
       <Separator />
       <section>
         <header>

@@ -20,6 +20,8 @@ export const useUserStore = create<UserState>()(
         loadProfile: async (router: AppRouterInstance) => {
           //? load the profile
           const profile = await apiProfile(router);
+          if (!profile) return null;
+          //? set the profile
           set({ profile });
           return profile;
         },

@@ -26,13 +26,13 @@ export default function UserMetadata({
   const loadUser = useUsersStore((state) => state.loadUser);
 
   const [value, setValue] = useState<string | undefined>(
-    JSON.stringify(user.metadata, null, 2),
+    JSON.stringify(user.metadata ?? undefined, null, 2),
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   //? When the user changes, update the value
   useEffect(() => {
-    setValue(JSON.stringify(user.metadata, null, 2));
+    setValue(JSON.stringify(user.metadata ?? undefined, null, 2));
   }, [user]);
 
   const refreshCallback = useCallback(async () => {

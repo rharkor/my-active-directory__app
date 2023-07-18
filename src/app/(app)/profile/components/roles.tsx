@@ -2,7 +2,7 @@
 
 import { toast } from '@/components/ui/use-toast';
 import { useUserStore } from '@/contexts/user.store';
-import { apiGetUserRoles, apiUpdateUser } from '@/lib/auth-calls';
+import { apiGetUserRoles, apiUpdateUser } from '@/lib/api-calls';
 import { UnknowError } from '@/lib/constants';
 import { logger } from '@/lib/logger';
 import { ApiSchemas, UserSchema } from '@/types/api';
@@ -83,6 +83,10 @@ export default function Roles({ user }: { user?: z.infer<typeof UserSchema> }) {
           router,
         );
         await getRoles(false);
+        toast({
+          title: 'Success',
+          description: 'Roles updated successfully',
+        });
       } catch (error) {
         logger.error('Error updating user roles', error);
         if (typeof error === 'string') {

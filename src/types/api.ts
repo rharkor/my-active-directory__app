@@ -337,4 +337,7 @@ export const ApiSchemas = {
       deleted: z.boolean(),
     }),
   },
+  resetServiceAccountToken: {
+    response: ServiceAccountSchema.pick({ token: true }),
+  },
 };

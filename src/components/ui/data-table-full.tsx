@@ -152,6 +152,7 @@ export interface DataTableFullProps<
   createRowModalTitle: string;
   createRowModalDescription?: string;
   onRowsFetched?: (rows: z.infer<TRowType>) => z.TypeOf<TRowType>;
+  onRowCreated?: (row: z.infer<TRowType>['data'][number]) => void;
 }
 
 export default function DataTableFull<
@@ -180,6 +181,7 @@ export default function DataTableFull<
   createRowModalTitle,
   createRowModalDescription,
   onRowsFetched,
+  onRowCreated,
 }: DataTableFullProps<TRowType, TCreateSchema, TUpdateSchema>) {
   const router = useRouter();
   //? Rows
@@ -221,7 +223,8 @@ export default function DataTableFull<
   const createRow = async (values: z.TypeOf<TCreateSchema>) => {
     try {
       setIsRowModalSubmitting(true);
-      await apiCreateRow(values, router);
+      const res = await apiCreateRow(values, router);
+      if (onRowCreated) onRowCreated(res as z.infer<TRowType>['data'][number]);
       toast({
         title: 'Success',
         description: createRowSuccessMessage,
@@ -420,7 +423,7 @@ export default function DataTableFull<
       }
       setRows(res);
     } catch (error) {
-      logger.error("Error while fetching rows", error);
+      logger.error('Error while fetching rows', error);
       if (typeof error === 'string') {
         toast({
           title: 'Error',

@@ -474,3 +474,20 @@ export const apiDeleteServiceAccount = async (
     router,
   ) as Promise<z.infer<typeof ApiSchemas.deleteServiceAccount.response>>;
 };
+
+/**
+ * Reset the token
+ */
+export const apiResetServiceAccountToken = async (
+  id: string,
+  router: AppRouterInstance,
+) => {
+  //? send the request
+  return api.fetch(
+    `/service-accounts/${id}/token`,
+    {
+      method: 'PATCH',
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.resetServiceAccountToken.response>>;
+};

@@ -82,11 +82,11 @@ export default function Roles({ user }: { user?: z.infer<typeof UserSchema> }) {
           { roles: data.roles },
           router,
         );
-        await getRoles(false);
         toast({
           title: 'Success',
           description: 'Roles updated successfully',
         });
+        await getRoles(false);
       } catch (error) {
         logger.error('Error updating user roles', error);
         if (typeof error === 'string') {

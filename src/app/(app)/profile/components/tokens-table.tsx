@@ -1,6 +1,6 @@
 'use client';
 
-import { apiGetAllTokens, apiRevokeToken } from '@/lib/auth-calls';
+import { apiGetAllTokens, apiRevokeToken } from '@/lib/api-calls';
 import { ApiSchemas } from '@/types/api';
 import { useRouter } from 'next/navigation';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';

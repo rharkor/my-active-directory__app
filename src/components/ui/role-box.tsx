@@ -1,6 +1,6 @@
 'use client';
 
-import { apiGetAllRolesWithoutPagination } from '@/lib/auth-calls';
+import { apiGetAllRolesWithoutPagination } from '@/lib/api-calls';
 import { FancyBox, FancyBoxItem } from './fancy-box';
 import * as z from 'zod';
 import { InputProps } from './input';

@@ -16,7 +16,7 @@ import { Form } from '@/components/ui/form';
 import FormField from '@/components/ui/form-field';
 import { useToast } from '@/components/ui/use-toast';
 import { useUserStore } from '@/contexts/user.store';
-import { apiDeleteUser } from '@/lib/auth-calls';
+import { apiDeleteUser } from '@/lib/api-calls';
 import { UnknowError } from '@/lib/constants';
 import { logger } from '@/lib/logger';
 import { ApiSchemas, UserSchema } from '@/types/api';

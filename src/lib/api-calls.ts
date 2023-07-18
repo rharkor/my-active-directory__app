@@ -377,3 +377,100 @@ export const apiDeleteUser = async (
     router,
   ) as Promise<z.infer<typeof ApiSchemas.deleteUser.response>>;
 };
+
+/**
+ * Get all service accounts
+ */
+export const apiGetAllServiceAccounts = async (
+  router: AppRouterInstance,
+  page?: string,
+  itemsPerPage?: string,
+  filters?: ColumnFiltersState,
+  sorting?: SortingState,
+) => {
+  //? send the request
+  return api.fetch(
+    `/service-accounts${page ? `?page=${page}` : '?page=1'}${
+      itemsPerPage ? `&limit=${itemsPerPage}` : ''
+    }${filtersToQuery(filters ?? [])}${sortingToQuery(sorting ?? [])}`,
+    undefined,
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.getAllServiceAccounts.response>>;
+};
+
+/**
+ * Get one service account
+ */
+export const apiGetServiceAccount = async (
+  id: string,
+  router: AppRouterInstance,
+) => {
+  //? send the request
+  return api.fetch(
+    `/service-accounts/${id}`,
+    {
+      next: {
+        revalidate: 0, //? Do not cache the data
+      },
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.getOneServiceAccount.response>>;
+};
+
+/**
+ * Create a service account
+ */
+export const apiCreateServiceAccount = async (
+  body: z.infer<typeof ApiSchemas.createServiceAccount.body>,
+  router: AppRouterInstance,
+) => {
+  //? validate the body against the schema
+  const parsed = ApiSchemas.createServiceAccount.body.parse(body);
+  //? send the request
+  return api.fetch(
+    `/service-accounts`,
+    {
+      method: 'POST',
+      body: JSON.stringify(parsed),
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.createServiceAccount.response>>;
+};
+
+/**
+ * Update a service account
+ */
+export const apiUpdateServiceAccount = async (
+  id: string,
+  body: z.infer<typeof ApiSchemas.updateServiceAccount.body>,
+  router: AppRouterInstance,
+) => {
+  //? validate the body against the schema
+  const parsed = ApiSchemas.updateServiceAccount.body.parse(body);
+  //? send the request
+  return api.fetch(
+    `/service-accounts/${id}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(parsed),
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.updateServiceAccount.response>>;
+};
+
+/**
+ * Delete a service account
+ */
+export const apiDeleteServiceAccount = async (
+  id: string,
+  router: AppRouterInstance,
+) => {
+  //? send the request
+  return api.fetch(
+    `/service-accounts/${id}`,
+    {
+      method: 'DELETE',
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.deleteServiceAccount.response>>;
+};

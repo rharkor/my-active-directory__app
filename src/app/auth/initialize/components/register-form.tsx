@@ -17,7 +17,7 @@ import {
 import { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
-import { apiRegisterFirstUser } from '@/lib/auth-calls';
+import { apiRegisterFirstUser } from '@/lib/api-calls';
 import api from '@/lib/api';
 import { passWordRegexError, passwordRegex } from '@/lib/utils';
 import { logger } from '@/lib/logger';

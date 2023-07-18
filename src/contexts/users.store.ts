@@ -1,4 +1,4 @@
-import { apiGetUser } from '@/lib/auth-calls';
+import { apiGetUser } from '@/lib/api-calls';
 import { UserSchema } from '@/types/api';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 import { create } from 'zustand';

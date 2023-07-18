@@ -18,7 +18,7 @@ export const passwordRegex = new RegExp(
 export const passWordRegexError =
   'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character.';
 
-export const slugRegex = new RegExp(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+export const slugRegex = new RegExp(/^[a-z0-9]+(?:-|[a-z0-9])*$/);
 export const slugRegexError =
   'Slug must be lowercase and contain only letters, numbers and dashes.';
 

@@ -13,7 +13,7 @@ import FormField from '@/components/ui/form-field';
 import { Button } from '@/components/ui/button';
 import { useUserStore } from '@/contexts/user.store';
 import { logger } from '@/lib/logger';
-import { apiUpdateProfile } from '@/lib/auth-calls';
+import { apiUpdateProfile } from '@/lib/api-calls';
 import { ApiSchemas, UserSchema } from '@/types/api';
 import { UnknowError } from '@/lib/constants';
 import { asOptionalField } from '@/lib/utils';

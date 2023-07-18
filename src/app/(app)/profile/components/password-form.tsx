@@ -20,7 +20,7 @@ import { logger } from '@/lib/logger';
 import { Form } from '@/components/ui/form';
 import FormField from '@/components/ui/form-field';
 import { ApiSchemas, UserSchema } from '@/types/api';
-import { apiUpdatePassword } from '@/lib/auth-calls';
+import { apiUpdatePassword } from '@/lib/api-calls';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
 import { DialogClose } from '@radix-ui/react-dialog';

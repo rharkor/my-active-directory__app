@@ -91,6 +91,13 @@ export const TokensSchema = z.object({
   refreshToken: z.string(),
 });
 
+export const ServiceAccountSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  description: z.string().optional(),
+  token: z.string(),
+});
+
 export const ApiSchemas = {
   initialized: {
     response: z.object({
@@ -297,6 +304,35 @@ export const ApiSchemas = {
         z.string().min(8).max(50).regex(passwordRegex, passWordRegexError),
       ),
     }),
+    response: z.object({
+      deleted: z.boolean(),
+    }),
+  },
+  getAllServiceAccounts: {
+    response: PaginationSchema.extend({
+      data: z.array(ServiceAccountSchema.omit({ token: true })),
+    }),
+  },
+  getOneServiceAccount: {
+    response: ServiceAccountSchema,
+  },
+  createServiceAccount: {
+    body: z.object({
+      name: z.string().min(5).max(50).regex(slugRegex, slugRegexError),
+      description: asOptionalField(z.string()),
+    }),
+    response: ServiceAccountSchema,
+  },
+  updateServiceAccount: {
+    body: z.object({
+      name: asOptionalField(
+        z.string().min(5).max(50).regex(slugRegex, slugRegexError),
+      ),
+      description: asOptionalField(z.string().optional()),
+    }),
+    response: ServiceAccountSchema.omit({ token: true }),
+  },
+  deleteServiceAccount: {
     response: z.object({
       deleted: z.boolean(),
     }),

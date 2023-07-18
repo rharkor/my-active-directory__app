@@ -1,4 +1,4 @@
-import { apiProfile } from '@/lib/auth-calls';
+import { apiProfile } from '@/lib/api-calls';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';

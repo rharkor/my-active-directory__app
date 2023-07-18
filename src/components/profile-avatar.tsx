@@ -2,7 +2,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUserStore } from '@/contexts/user.store';
-import { apiUploadFile } from '@/lib/auth-calls';
+import { apiUploadFile } from '@/lib/api-calls';
 import { cn } from '@/lib/utils';
 import { TrashIcon, UploadIcon } from '@radix-ui/react-icons';
 import { useRouter } from 'next/navigation';

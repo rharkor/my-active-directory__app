@@ -2,7 +2,7 @@
 
 import DataTableFull from '@/components/ui/data-table-full';
 import { ApiSchemas } from '@/types/api';
-import { apiCreateUser, apiGetAllUsers } from '@/lib/auth-calls';
+import { apiCreateUser, apiGetAllUsers } from '@/lib/api-calls';
 import { getColumns } from './columns';
 import { useUserStore } from '@/contexts/user.store';
 

@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { useUsersStore } from '@/contexts/users.store';
-import { apiUpdateUser } from '@/lib/auth-calls';
+import { apiUpdateUser } from '@/lib/api-calls';
 import { UnknowError } from '@/lib/constants';
 import { logger } from '@/lib/logger';
 import { UserSchema } from '@/types/api';

@@ -1,21 +1,11 @@
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import Link from 'next/link';
+import Table from './components/table';
 
 export default function ServiceAccounts() {
   return (
-    <main className="flex  flex-col items-center p-24">
-      <h1 className="text-6xl font-bold">Service Accounts</h1>
-      <div className={cn('flex mt-12')}>
-        <Link href="/">
-          <Button variant="default">Home</Button>
-        </Link>
-        <Link href="/roles">
-          <Button variant="default" className="ml-6">
-            Roles
-          </Button>
-        </Link>
-      </div>
+    <main className="container flex flex-col my-8">
+      <h1 className="text-2xl font-bold tracking-tight">Service Accounts</h1>
+      <h2 className="text-muted-foreground">Manage your service accounts</h2>
+      <Table />
     </main>
   );
 }

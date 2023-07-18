@@ -1,5 +1,5 @@
 import { RequestCookies } from 'next/dist/compiled/@edge-runtime/cookies';
-import { apiBackendInitialized } from './auth-calls';
+import { apiBackendInitialized } from './api-calls';
 import Cookies from 'universal-cookie';
 import jwt_decode from 'jwt-decode';
 import api from './api';

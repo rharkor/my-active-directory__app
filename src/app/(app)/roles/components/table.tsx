@@ -7,7 +7,7 @@ import {
   apiDeleteRole,
   apiGetAllRoles,
   apiUpdateRole,
-} from '@/lib/auth-calls';
+} from '@/lib/api-calls';
 import { getColumns } from './columns';
 import * as z from 'zod';
 
@@ -46,7 +46,7 @@ export default function Table() {
       searchColumnName={'name'}
       searchPlaceholder="Search roles by name"
       createRowModalTitle="Create role"
-      createRowModalDescription="Create a new row to help you manage users in your organization."
+      createRowModalDescription="Create a new role to help you manage users in your organization."
       onRowsFetched={onRowsFetched}
     />
   );

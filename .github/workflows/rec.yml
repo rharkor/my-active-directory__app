@@ -82,7 +82,7 @@ jobs:
           chmod 644 ~/.ssh/known_hosts
 
           ssh -p ${{ vars.SSH_PORT }} ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }} "mkdir -p ~/yuniq/my-active-directory/my-active-directory__app/rec"
-          scp -P ${{ vars.SSH_PORT }} docker-compose.yml ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }}:~/yuniq/my-active-directory/my-active-directory__app/rec/docker-compose.yml
+          scp -P ${{ vars.SSH_PORT }} docker-compose.rec.yml ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }}:~/yuniq/my-active-directory/my-active-directory__app/rec/docker-compose.yml
 
       - name: Deploy to rec
         uses: appleboy/ssh-action@master

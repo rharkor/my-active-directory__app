@@ -1,6 +1,6 @@
 version: '3'
 services:
-  huort-website-rec__app:
+  my-active-directory__app:
     image: registry.yuniq.agency/my-active-directory/my-active-directory-app-rec:latest
     ports:
       - '10054:3000'

@@ -51,7 +51,7 @@ export default function DeleteForm({
   errorMessage,
   forceDelete,
 }: {
-  user?: z.infer<typeof UserSchema>;
+  user?: z.infer<typeof UserSchema> | null;
   buttonMessage?: string;
   confirmMessage?: string | React.ReactNode;
   skeleton?: boolean;
@@ -60,7 +60,7 @@ export default function DeleteForm({
   forceDelete?: boolean;
 }) {
   const userStoreProfile = useUserStore((state) => state.profile);
-  const profile = user ?? userStoreProfile;
+  const profile = user === undefined ? userStoreProfile : user;
 
   const router = useRouter();
   const { toast } = useToast();

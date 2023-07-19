@@ -31,7 +31,7 @@ export default function ProfileForm({
   successMessage,
   errorMessage,
 }: {
-  user?: z.infer<typeof UserSchema>;
+  user?: z.infer<typeof UserSchema> | null;
   skeleton?: boolean;
   refreshCallback?: () => void;
   successMessage?: string;
@@ -39,7 +39,7 @@ export default function ProfileForm({
 }) {
   const userStoreProfile = useUserStore((state) => state.profile);
   const loadProfile = useUserStore((state) => state.loadProfile);
-  const profile = user ?? userStoreProfile;
+  const profile = user === undefined ? userStoreProfile : user;
 
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);

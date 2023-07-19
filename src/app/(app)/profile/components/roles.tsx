@@ -22,9 +22,13 @@ const updateRolesSchema = z.object({
 
 const itemsPerPage = 20;
 
-export default function Roles({ user }: { user?: z.infer<typeof UserSchema> }) {
+export default function Roles({
+  user,
+}: {
+  user?: z.infer<typeof UserSchema> | null;
+}) {
   const userStoreProfile = useUserStore((state) => state.profile);
-  const profile = user ?? userStoreProfile;
+  const profile = user === undefined ? userStoreProfile : user;
   const router = useRouter();
 
   const [roles, setRoles] =
@@ -42,9 +46,9 @@ export default function Roles({ user }: { user?: z.infer<typeof UserSchema> }) {
 
   const getRoles = useCallback(
     async (updateLoadingState = true) => {
+      if (!profile?.id) return;
       try {
         if (updateLoadingState) setIsRolesLoading(true);
-        if (!profile?.id) throw new Error('User id not found');
         const roles = await apiGetUserRoles(
           profile.id.toString(),
           router,

@@ -20,9 +20,8 @@ export default function UserPage({
   params: { userId: string };
 }) {
   const router = useRouter();
-  const user: z.infer<typeof UserSchema> | undefined = useUsersStore(
-    (state) => state.users[userId],
-  );
+  const user: z.infer<typeof UserSchema> | null =
+    useUsersStore((state) => state.users[userId]) ?? null;
   const loadUser = useUsersStore((state) => state.loadUser);
 
   const refreshCallback = useCallback(async () => {

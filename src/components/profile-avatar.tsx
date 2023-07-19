@@ -38,7 +38,7 @@ export default function ProfileAvatar({
   onChange,
 }: ProfileAvatarProps) {
   const userStoreProfile = useUserStore((state) => state.profile);
-  const profile = user ?? userStoreProfile;
+  const profile = user === undefined ? userStoreProfile : user;
 
   const { toast } = useToast();
   const router = useRouter();

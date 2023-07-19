@@ -20,9 +20,8 @@ export default function UserMetadata({
 }) {
   const router = useRouter();
   const editorRef = useRef<HTMLDivElement>(null);
-  const user: z.infer<typeof UserSchema> | undefined = useUsersStore(
-    (state) => state.users[userId],
-  );
+  const user: z.infer<typeof UserSchema> | null =
+    useUsersStore((state) => state.users[userId]) ?? null;
   const loadUser = useUsersStore((state) => state.loadUser);
 
   const [value, setValue] = useState<string | undefined>(

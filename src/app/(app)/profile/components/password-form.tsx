@@ -61,14 +61,14 @@ export default function PasswordForm({
   successMessage,
   errorMessage,
 }: {
-  user?: z.infer<typeof UserSchema>;
+  user?: z.infer<typeof UserSchema> | null;
   skeleton?: boolean;
   successMessage?: string;
   errorMessage?: string;
 }) {
   const userStoreProfile = useUserStore((state) => state.profile);
   const loadProfile = useUserStore((state) => state.loadProfile);
-  const profile = user ?? userStoreProfile;
+  const profile = user === undefined ? userStoreProfile : user;
 
   const router = useRouter();
   const { toast } = useToast();
@@ -98,6 +98,9 @@ export default function PasswordForm({
   useEffect(() => {
     if (profile) {
       form.setValue('id', profile.id.toString());
+      form.setValue('oldPassword', '');
+      form.setValue('password', '');
+      form.setValue('confirmPassword', '');
     }
   }, [profile, form]);
 

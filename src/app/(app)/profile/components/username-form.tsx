@@ -43,14 +43,14 @@ export default function UsernameForm({
   successMessage,
   errorMessage,
 }: {
-  user?: z.infer<typeof UserSchema>;
+  user?: z.infer<typeof UserSchema> | null;
   skeleton?: boolean;
   successMessage?: string;
   errorMessage?: string;
 }) {
   const userStoreProfile = useUserStore((state) => state.profile);
   const loadProfile = useUserStore((state) => state.loadProfile);
-  const profile = user ?? userStoreProfile;
+  const profile = user === undefined ? userStoreProfile : user;
 
   const router = useRouter();
   const { toast } = useToast();

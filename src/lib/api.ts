@@ -74,6 +74,7 @@ const _haveContentType = (options?: RequestInit) => {
 const api = {
   _accessToken: '',
   _refreshToken: '',
+  _lastRefresh: 0,
   fetch: async (
     path: string,
     options?: RequestInit,
@@ -81,8 +82,8 @@ const api = {
     refreshTokens = true,
     setContentType = true,
   ) => {
-    //* Refresh credentials before each request
-    if (refreshTokens)
+    //* Refresh credentials before each request (if needed 1 minute before)
+    if (refreshTokens && api._lastRefresh + 1000 * 60 < Date.now())
       try {
         //? Refresh the token
         const tokens = await api.refreshToken(
@@ -93,6 +94,8 @@ const api = {
         );
         //? Store the access token in the cookies
         api.setTokens(tokens);
+        //? Update the last refresh time
+        api._lastRefresh = Date.now();
       } catch (error) {
         logger.error(`Error refreshing the token`, error);
       }

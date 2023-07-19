@@ -32,6 +32,8 @@
     "@types/nprogress": "^0.2.0",
     "@types/react": "18.2.14",
     "@types/react-dom": "18.2.6",
+    "@typescript-eslint/eslint-plugin": "^6.1.0",
+    "@typescript-eslint/parser": "^6.1.0",
     "autoprefixer": "10.4.14",
     "class-variance-authority": "^0.6.1",
     "clsx": "^1.2.1",
@@ -60,8 +62,6 @@
   "devDependencies": {
     "@next/eslint-plugin-next": "^13.4.8",
     "@total-typescript/ts-reset": "^0.4.2",
-    "@typescript-eslint/eslint-plugin": "^5.61.0",
-    "@typescript-eslint/parser": "^5.61.0",
     "dependency-cruiser": "^13.1.1",
     "eslint": "^8.44.0",
     "eslint-config-prettier": "^8.8.0",

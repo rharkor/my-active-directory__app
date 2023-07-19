@@ -16,7 +16,7 @@ ENV NODE_ENV production
 COPY package.json .
 COPY package-lock.json .
 
-RUN npm ci
+RUN npm ci --only=production
 
 ##Copy new files or directories into the filesystem of the container
 COPY . .

@@ -64,7 +64,10 @@ export const FancyBox = React.forwardRef<HTMLInputElement, FancyBoxProps>(
       );
     };
 
-    const valuesWatched = props.form.watch(props.inputProps.name ?? '');
+    const valuesWatched: string[] = props.form.watch(
+      props.inputProps.name ?? '',
+      [],
+    );
 
     React.useEffect(() => {
       if (valuesWatched.length > 0) {

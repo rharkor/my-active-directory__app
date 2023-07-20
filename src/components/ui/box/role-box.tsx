@@ -3,7 +3,7 @@
 import { apiGetAllRolesWithoutPagination } from '@/lib/api-calls';
 import { FancyBox, FancyBoxItem } from './fancy-box';
 import * as z from 'zod';
-import { InputProps } from './input';
+import { InputProps } from '../input';
 import React, { useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { UseFormReturn } from 'react-hook-form';

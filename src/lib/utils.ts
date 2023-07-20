@@ -1,5 +1,5 @@
 import { UserSchema } from '@/types/api';
-import { ColumnFiltersState, SortingState } from '@tanstack/react-table';
+import { ColumnFilter, SortingState } from '@tanstack/react-table';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import * as z from 'zod';
@@ -90,12 +90,18 @@ export const getTimeBetween = (
   return `${timeValue} ${timeUnit}${timeValue !== 1 ? 's' : ''}`;
 };
 
-export const filtersToQuery = (filters: ColumnFiltersState) => {
+export const filtersToQuery = (
+  filters: (ColumnFilter & {
+    operator?: string;
+  })[],
+) => {
   let query = '';
   for (const key in filters) {
     if (filters[key]) {
       const filter = filters[key];
-      query += `&filter.${filter.id}=$ilike:${filter.value}`;
+      query += `&filter.${filter.id}=${filter.operator ?? '$ilike'}:${
+        filter.value
+      }`;
     }
   }
   return query;

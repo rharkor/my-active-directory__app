@@ -117,8 +117,8 @@ export const ApiSchemas = {
   },
   login: {
     body: z.object({
-      username: z.string().min(5).max(50),
-      password: z.string().min(8).max(50),
+      username: z.string(),
+      password: z.string(),
     }),
     response: TokensSchema,
   },

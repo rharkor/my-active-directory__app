@@ -522,3 +522,93 @@ export const apiResetServiceAccountToken = async (
     router,
   ) as Promise<z.infer<typeof ApiSchemas.resetServiceAccountToken.response>>;
 };
+
+/**
+ * Get all projects
+ */
+export const apiGetAllProjects = async (
+  router: AppRouterInstance,
+  page?: string,
+  itemsPerPage?: string,
+  filters?: ColumnFiltersState,
+  sorting?: SortingState,
+) => {
+  //? send the request
+  return api.fetch(
+    `/projects${page ? `?page=${page}` : '?page=1'}${
+      itemsPerPage ? `&limit=${itemsPerPage}` : ''
+    }${filtersToQuery(filters ?? [])}${sortingToQuery(sorting ?? [])}`,
+    undefined,
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.getAllProjects.response>>;
+};
+
+/**
+ * Get all projects without pagination
+ */
+export const apiGetAllProjectsWithoutPagination = async (
+  router: AppRouterInstance,
+) => {
+  //? send the request
+  return api.fetch(`/projects/no-pagination`, undefined, router) as Promise<
+    z.infer<typeof ApiSchemas.getAllProjectsNoPagination.response>
+  >;
+};
+
+/**
+ * Create a project
+ */
+export const apiCreateProject = async (
+  body: z.infer<typeof ApiSchemas.createProject.body>,
+  router: AppRouterInstance,
+) => {
+  //? validate the body against the schema
+  const parsed = ApiSchemas.createProject.body.parse(body);
+  //? send the request
+  return api.fetch(
+    `/projects`,
+    {
+      method: 'POST',
+      body: JSON.stringify(parsed),
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.createProject.response>>;
+};
+
+/**
+ * Update a project
+ */
+export const apiUpdateProject = async (
+  id: string,
+  body: z.infer<typeof ApiSchemas.updateProject.body>,
+  router: AppRouterInstance,
+) => {
+  //? validate the body against the schema
+  const parsed = ApiSchemas.updateProject.body.parse(body);
+  //? send the request
+  return api.fetch(
+    `/projects/${id}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(parsed),
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.updateProject.response>>;
+};
+
+/**
+ * Delete a project
+ */
+export const apiDeleteProject = async (
+  id: string,
+  router: AppRouterInstance,
+) => {
+  //? send the request
+  return api.fetch(
+    `/projects/${id}`,
+    {
+      method: 'DELETE',
+    },
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.deleteProject.response>>;
+};

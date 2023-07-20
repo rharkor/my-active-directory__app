@@ -63,8 +63,14 @@ export const RoleSchema = z.object({
   description: z.string().optional(),
   color: z.string().optional(),
 });
-
 export const RolesSchema = z.array(RoleSchema);
+
+export const ProjectSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  color: z.string().optional(),
+});
+export const ProjectsSchema = z.array(ProjectSchema);
 
 export const UserSchema = z.object({
   id: z.number(),
@@ -348,5 +354,34 @@ export const ApiSchemas = {
   },
   resetServiceAccountToken: {
     response: ServiceAccountSchema.pick({ token: true }),
+  },
+  getAllProjects: {
+    response: PaginationSchema.extend({
+      data: ProjectsSchema,
+    }),
+  },
+  getAllProjectsNoPagination: {
+    response: z.object({
+      data: ProjectsSchema,
+    }),
+  },
+  createProject: {
+    body: z.object({
+      name: z.string().nonempty().regex(slugRegex, slugRegexError),
+      color: z.string().optional(),
+    }),
+    response: ProjectSchema,
+  },
+  updateProject: {
+    body: z.object({
+      name: z.string().regex(slugRegex, slugRegexError).optional(),
+      color: z.string().optional(),
+    }),
+    response: ProjectSchema,
+  },
+  deleteProject: {
+    response: z.object({
+      deleted: z.boolean(),
+    }),
   },
 };

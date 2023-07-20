@@ -2,7 +2,6 @@
 
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -26,20 +25,38 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
-export const deleteFormSchema = z.object({
+export const deleteFormSchema = z
+  .object({
+    id: z.string(),
+    username: z
+      .string()
+      .optional()
+      .transform((v) => (v === '' ? undefined : v)),
+    email: z
+      .string()
+      .optional()
+      .transform((v) => (v === '' ? undefined : v)),
+    password: z.string().nonempty(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.username === undefined && data.email === undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'You must provide a username.',
+        fatal: true,
+        path: ['username'],
+      });
+      ctx.addIssue({
+        code: 'custom',
+        message: 'You must provide an email.',
+        fatal: true,
+        path: ['email'],
+      });
+    }
+  });
+
+export const deleteForceFormSchema = z.object({
   id: z.string(),
-  username: z
-    .string()
-    .optional()
-    .transform((v) => (v === '' ? undefined : v)),
-  email: z
-    .string()
-    .optional()
-    .transform((v) => (v === '' ? undefined : v)),
-  password: z
-    .string()
-    .optional()
-    .transform((v) => (v === '' ? undefined : v)),
 });
 
 export default function DeleteForm({
@@ -65,6 +82,7 @@ export default function DeleteForm({
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
 
   //? Define the skeleton values
   const skeletonValues = {
@@ -86,14 +104,26 @@ export default function DeleteForm({
     },
   });
 
+  const forceForm = useForm<z.infer<typeof deleteForceFormSchema>>({
+    resolver: zodResolver(deleteForceFormSchema),
+    defaultValues: {
+      id: profile?.id.toString() ?? '',
+    },
+  });
+
   //? Update the form values when the profile changes
   useEffect(() => {
     if (profile) {
       form.setValue('id', profile.id.toString());
+      forceForm.setValue('id', profile.id.toString());
     }
-  }, [profile, form]);
+  }, [profile, form, forceForm]);
 
-  const onSubmit = async (values: z.infer<typeof deleteFormSchema>) => {
+  const onSubmit = async (
+    values:
+      | z.infer<typeof deleteFormSchema>
+      | z.infer<typeof deleteForceFormSchema>,
+  ) => {
     try {
       //? Submit the form
       setIsSubmitting(true);
@@ -108,7 +138,8 @@ export default function DeleteForm({
         title: 'Success',
         description: successMessage ?? 'Account deleted successfully',
       });
-      router.push('/');
+      setDeleteModalIsOpen(false);
+      router.push('/login');
     } catch (error) {
       logger.error(
         errorMessage ?? 'Error deleting account, please contact support',
@@ -130,31 +161,42 @@ export default function DeleteForm({
     }
   };
 
+  const usernameInput = form.watch('username');
+  const emailInput = form.watch('email');
+  const isInvalidUsernameOrEmail =
+    !forceDelete &&
+    profile?.username !== usernameInput &&
+    profile?.email !== emailInput;
+
   return (
     <section>
       <header>
         <h3 className="text-lg font-medium">Delete Account</h3>
       </header>
-      <AlertDialog>
+      <AlertDialog
+        open={deleteModalIsOpen}
+        onOpenChange={(isOpen) => setDeleteModalIsOpen(isOpen)}
+      >
         <AlertDialogTrigger asChild>
           <Button variant="destructive" className="mt-4">
             {buttonMessage || 'Delete Your Account'}
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-4 flex flex-col"
-            >
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {confirmMessage ||
-                    'This action cannot be undone. This will permanently delete your account and remove your data from our servers.'}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              {!forceDelete && (
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmMessage ||
+                'This action cannot be undone. This will permanently delete your account and remove your data from our servers.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {!forceDelete ? (
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4 flex flex-col"
+                id="delete-form"
+              >
                 <div className="space-y-4">
                   {profile?.username ? (
                     <FormField
@@ -187,21 +229,29 @@ export default function DeleteForm({
                     description="Enter your password."
                   />
                 </div>
-              )}
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction asChild>
-                  <Button
-                    variant="destructive"
-                    type="submit"
-                    isLoading={isSubmitting}
-                  >
-                    Delete
-                  </Button>
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </form>
-          </Form>
+              </form>
+            </Form>
+          ) : (
+            <Form {...forceForm}>
+              <form
+                onSubmit={forceForm.handleSubmit(onSubmit)}
+                className="space-y-4 flex flex-col"
+                id="delete-form"
+              ></form>
+            </Form>
+          )}
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button
+              variant="destructive"
+              type="submit"
+              isLoading={isSubmitting}
+              form="delete-form"
+              disabled={isSubmitting || isInvalidUsernameOrEmail}
+            >
+              Delete
+            </Button>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </section>

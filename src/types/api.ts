@@ -281,8 +281,8 @@ export const ApiSchemas = {
   },
   createUser: {
     body: z.object({
-      email: asOptionalField(z.string().email()),
-      username: asOptionalField(z.string().min(5).max(50)),
+      email: z.string().email(),
+      username: z.string().min(5).max(50),
       password: asOptionalField(
         z.string().min(8).max(50).regex(passwordRegex, passWordRegexError),
       ),
@@ -311,9 +311,7 @@ export const ApiSchemas = {
       force: z.boolean(),
       email: asOptionalField(z.string().email()),
       username: asOptionalField(z.string().min(5).max(50)),
-      password: asOptionalField(
-        z.string().min(8).max(50).regex(passwordRegex, passWordRegexError),
-      ),
+      password: asOptionalField(z.string()),
     }),
     response: z.object({
       deleted: z.boolean(),

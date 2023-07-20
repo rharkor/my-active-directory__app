@@ -209,6 +209,18 @@ export const apiGetAllRolesWithoutPagination = async (
 };
 
 /**
+ * Get all sysroles without pagination
+ */
+export const apiGetAllSysRolesWithoutPagination = async (
+  router: AppRouterInstance,
+) => {
+  //? send the request
+  return api.fetch(`/roles/sys/no-pagination`, undefined, router) as Promise<
+    z.infer<typeof ApiSchemas.getAllSysRolesNoPagination.response>
+  >;
+};
+
+/**
  * Create a role
  */
 export const apiCreateRole = async (
@@ -316,6 +328,25 @@ export const apiGetUserRoles = async (
     undefined,
     router,
   ) as Promise<z.infer<typeof ApiSchemas.getUserRoles.response>>;
+};
+
+/**
+ * Get user's sysroles
+ */
+export const apiGetUserSysRoles = async (
+  id: string,
+  router: AppRouterInstance,
+  page?: string,
+  itemsPerPage?: string,
+) => {
+  //? send the request
+  return api.fetch(
+    `/users/${id}/sysroles${page ? `?page=${page}` : '?page=1'}${
+      itemsPerPage ? `&limit=${itemsPerPage}` : ''
+    }`,
+    undefined,
+    router,
+  ) as Promise<z.infer<typeof ApiSchemas.getUserSysRoles.response>>;
 };
 
 /**

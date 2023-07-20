@@ -104,6 +104,16 @@ export const getColumns: (
     },
   },
   {
+    accessorKey: 'sysroles',
+    name: 'sysroles',
+    forceHidden: true,
+    type: 'sysrole-box',
+    label: 'System Roles',
+    create: {
+      defaultValue: [],
+    },
+  },
+  {
     id: 'actions',
     cell: ({ row }) => {
       const user = row.original as Zod.TypeOf<typeof UserSchema>;

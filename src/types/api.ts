@@ -25,7 +25,6 @@ export type Role = {
   name: string;
   displayName: string;
   description: string | null;
-  deletable: boolean;
 };
 
 export type TokenDecoded = {
@@ -63,7 +62,6 @@ export const RoleSchema = z.object({
   displayName: z.string(),
   description: z.string().optional(),
   color: z.string().optional(),
-  deletable: z.boolean(),
 });
 
 export const RolesSchema = z.array(RoleSchema);
@@ -81,6 +79,7 @@ export const UserSchema = z.object({
     .nullable()
     .optional(),
   roles: RolesSchema.optional(),
+  sysroles: RolesSchema.optional(),
   activeRoles: z.number(),
 });
 
@@ -234,6 +233,11 @@ export const ApiSchemas = {
       data: RolesSchema,
     }),
   },
+  getAllSysRolesNoPagination: {
+    response: z.object({
+      data: RolesSchema,
+    }),
+  },
   createRole: {
     body: z.object({
       name: z.string().nonempty().regex(slugRegex, slugRegexError),
@@ -270,6 +274,11 @@ export const ApiSchemas = {
       data: RolesSchema,
     }),
   },
+  getUserSysRoles: {
+    response: PaginationSchema.extend({
+      data: RolesSchema,
+    }),
+  },
   createUser: {
     body: z.object({
       email: asOptionalField(z.string().email()),
@@ -281,6 +290,7 @@ export const ApiSchemas = {
       lastName: asOptionalField(z.string().min(2).max(50)),
       metadata: z.any().optional(),
       roles: z.array(z.string()).optional(),
+      sysroles: z.array(z.string()).optional(),
     }),
     response: UserSchema,
   },
@@ -292,6 +302,7 @@ export const ApiSchemas = {
       lastName: asOptionalField(z.string().min(2).max(50)),
       metadata: z.any().optional(),
       roles: z.array(z.string()).optional(),
+      sysroles: z.array(z.string()).optional(),
     }),
     response: UserSchema,
   },

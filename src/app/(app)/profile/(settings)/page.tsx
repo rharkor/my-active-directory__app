@@ -6,6 +6,7 @@ import PasswordForm from '../components/password-form';
 import TokensTable from '../components/tokens-table';
 import DeleteForm from '../components/delete-form';
 import Roles from '../components/roles';
+import SysRoles from '../components/sysroles';
 
 export default function Settings() {
   return (
@@ -22,6 +23,12 @@ export default function Settings() {
           <h3 className="text-lg font-medium">Roles</h3>
         </header>
         <Roles />
+      </section>
+      <section>
+        <header>
+          <h3 className="text-lg font-medium">System Roles</h3>
+        </header>
+        <SysRoles />
       </section>
       <Separator />
       <section>

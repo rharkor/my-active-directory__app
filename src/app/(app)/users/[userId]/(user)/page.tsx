@@ -5,6 +5,7 @@ import EmailForm from '@/app/(app)/profile/components/email-form';
 import PasswordForm from '@/app/(app)/profile/components/password-form';
 import ProfileForm from '@/app/(app)/profile/components/profile-form';
 import Roles from '@/app/(app)/profile/components/roles';
+import SysRoles from '@/app/(app)/profile/components/sysroles';
 import UsernameForm from '@/app/(app)/profile/components/username-form';
 import { Separator } from '@/components/ui/separator';
 import { useUsersStore } from '@/contexts/users.store';
@@ -50,6 +51,12 @@ export default function UserPage({
           <h3 className="text-lg font-medium">Roles</h3>
         </header>
         <Roles user={user} />
+      </section>
+      <section>
+        <header>
+          <h3 className="text-lg font-medium">System Roles</h3>
+        </header>
+        <SysRoles user={user} />
       </section>
       <Separator />
       <section>

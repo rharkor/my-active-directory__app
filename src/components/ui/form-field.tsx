@@ -13,6 +13,7 @@ import { PasswordEyeSlash } from '@/components/ui/password-eye-slash';
 import { RoleBox } from './role-box';
 import { cn } from '@/lib/utils';
 import { HTMLInputTypeAttribute } from 'react';
+import { SysRoleBox } from './sysrole-box';
 
 export type FormFieldProps<T extends z.ZodTypeAny> = {
   form: UseFormReturn<z.infer<T>>;
@@ -34,6 +35,8 @@ function getInner<T extends z.ZodTypeAny>({
 }: FormFieldProps<T> & { field: ControllerRenderProps<z.TypeOf<T>> }) {
   if (type === 'role-box') {
     return <RoleBox placeholder={placeholder} form={form} inputProps={field} />;
+  } else if (type === 'sysrole-box') {
+    return <SysRoleBox placeholder={placeholder} form={form} inputProps={field} />;
   } else if (type === 'password') {
     return (
       <PasswordEyeSlash

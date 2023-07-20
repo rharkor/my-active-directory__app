@@ -15,7 +15,7 @@ import Link from 'next/link';
 import React from 'react';
 import NavbarUserDropdown from './navbar-user-dropdown';
 
-const components: { title: string; href: string; description: string }[] = [
+const accounts: { title: string; href: string; description: string }[] = [
   {
     title: 'Users',
     href: '/',
@@ -35,16 +35,16 @@ export default function Navbar() {
     <NavigationMenu className="sticky top-0 z-50 border-b-border border-b flex-grow-0 p-2 flex flex-row justify-between w-full max-w-none bg-background">
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuTrigger>Components</NavigationMenuTrigger>
+          <NavigationMenuTrigger>Accounts</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-              {components.map((component) => (
+              {accounts.map((account) => (
                 <ListItem
-                  key={component.title}
-                  title={component.title}
-                  href={component.href}
+                  key={account.title}
+                  title={account.title}
+                  href={account.href}
                 >
-                  {component.description}
+                  {account.description}
                 </ListItem>
               ))}
             </ul>
@@ -54,6 +54,13 @@ export default function Navbar() {
           <Link href="/roles" legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               Roles
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          <Link href="/projects" legacyBehavior passHref>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Projects
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
